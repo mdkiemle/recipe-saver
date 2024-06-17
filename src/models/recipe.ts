@@ -1,17 +1,15 @@
 export interface Ingredient {
-  amount: string;
+  id: number;
+  recipeId: number;
+  measurement: string;
   item: string;
 }
 
-export interface Instruction {
-  value: string;
-}
-
 export interface Recipe {
-  ingredients: Ingredient[]
-  instructions: Instruction;
-}
-
-export interface RecipeBook {
-  [key: string]: Recipe;
+  id: number;
+  name: string;
+  ingredients: number[];
+  instructions: string; // might change
+  description?: string;
+  notes?: string;
 }

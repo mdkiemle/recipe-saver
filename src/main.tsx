@@ -17,6 +17,7 @@ const Main = (): ReactElement => {
         <Route path="/" element={<DashboardPage />}/>
         <Route path="/search" element={<SearchPage />} />
         <Route path="/recipe" element={<RecipePage />} />
+        <Route path="/recipe/:recipeId" element={<RecipePage />} />
       </Routes>
     </div>
 	);

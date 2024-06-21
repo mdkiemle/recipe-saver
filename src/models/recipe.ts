@@ -1,32 +1,28 @@
 export interface Ingredient {
   id: number;
-  measurement: string;
   item: string;
+  measurement: string;
 }
 
-export interface Measurement {
+export interface IngredientGroup {
   id: number;
-  value: string;
+  groupName: string;
+  ingredients: Ingredient[];
 }
 
 export interface Recipe {
   id: number;
   name: string;
-  instructions: string; // might change
-  description?: string;
+  instructions: string;
   notes?: string;
+  description?: string;
+  ingredientGroups: IngredientGroup[];
 }
 
 export interface Folder {
   id: number;
   name: string;
   recipes: number[];
-}
-
-export interface IngredientGroup {
-  id: number;
-  name: string;
-  recipeId: number;
 }
 
 export interface RawJoinRecipe {
@@ -39,24 +35,4 @@ export interface RawJoinRecipe {
   measurement: string;
   notes: string;
   recipeId: number;
-}
-
-export interface IngredientMerged {
-  id: number;
-  recipeId: number;
-  ingredientGroupId: number;
-  measurement: number;
-  item: string;
-  groupName?: string;
-}
-
-export interface IIngredient {
-  [key: string]: {
-   id: number;
-   recipeId: number;
-   ingredientGroupId: number;
-   measurement: number;
-   item: string;
-   groupName?: string;
-  }
 }

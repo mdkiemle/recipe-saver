@@ -14,6 +14,13 @@ const DashboardPage = (): ReactElement => {
     ipcRenderer.send("async-message", "SELECT * FROM recipe")
   });
 
+  useMount(() => {
+    ipcRenderer.once("folders-get", (event, arg) => {
+      console.log("folders get", arg);
+    });
+    ipcRenderer.send("get-all-folders");
+  });
+
   return (
     <div>
       Dashboard

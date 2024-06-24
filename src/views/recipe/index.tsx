@@ -1,15 +1,12 @@
-import {ReactElement, useEffect, useState} from "react";
+import {ReactElement, useState} from "react";
 import {Recipe} from "../../models/recipe"
-import { useLocation } from "react-router";
-import { useMount } from "../../hooks/useMount";
-import { ipcRenderer } from "electron";
-import {Dictionary, groupBy, uniqBy} from "lodash";
-import { RawReturn } from "../../util/pretty-recipe";
+import {useLocation} from "react-router";
+import {useMount} from "../../hooks/useMount";
+import {ipcRenderer} from "electron";
 
 const RecipePage = (): ReactElement => {
   const [recipe, setRecipe] = useState<Recipe>();
   const {state: recipeId} = useLocation();
-  const [value, setValue] = useState([]);
 
   useMount(() => {
     if (recipeId) {
@@ -25,6 +22,9 @@ const RecipePage = (): ReactElement => {
     <div>
       {recipe && <>
         <h2>{recipe.name}</h2>
+        <div>
+          {recipe?.description}
+        </div>
         {recipe.ingredientGroups.map(ig => <section key={ig.id}>
           <h3>{ig.groupName}</h3>
           <ul>

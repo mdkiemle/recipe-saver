@@ -30,7 +30,7 @@ export const prettyRecipe = (tableReturn: RawReturn[]): Recipe => {
         id: g.ingredientId,
         measurement: g.measurement,
         item: g.item,
-      })),
+      })).sort((a, b) => a.id - b.id),
     };
     ingGroups.push(groups);
   }

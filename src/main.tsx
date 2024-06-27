@@ -6,6 +6,7 @@ import {NavLink, Route, Routes} from "react-router-dom";
 import {DashboardPage} from "./views/dashboard";
 import {SearchPage} from "./views/search";
 import {RecipePage} from "./views/recipe";
+import { RecipeContextProvider } from "./context/RecipeContext";
 
 const Main = (): ReactElement => {
 	return (
@@ -16,7 +17,7 @@ const Main = (): ReactElement => {
       <Routes>
         <Route path="/" element={<DashboardPage />}/>
         <Route path="/search" element={<SearchPage />} />
-        <Route path="/recipe" element={<RecipePage />} />
+        <Route path="/recipe" element={<RecipeContextProvider><RecipePage /> </RecipeContextProvider>} />
         <Route path="/recipe/:recipeId" element={<RecipePage />} />
       </Routes>
     </div>

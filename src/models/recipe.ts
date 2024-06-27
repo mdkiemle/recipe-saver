@@ -13,7 +13,7 @@ export interface IngredientGroup {
 export interface Recipe {
   id: number;
   name: string;
-  instructions: string;
+  instructions?: string;
   notes?: string;
   description?: string;
   ingredientGroups: IngredientGroup[];

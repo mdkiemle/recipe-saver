@@ -10,12 +10,12 @@ export interface RawReturn {
   description?: string;
   notes?: string;
   name: string;
-  instructions: string;
-  groupName: string;
-  groupId: number;
-  ingredientId: number;
-  measurement: string;
-  item: string;
+  instructions?: string;
+  groupName?: string;
+  groupId?: number;
+  ingredientId?: number;
+  measurement?: string;
+  item?: string;
 }
 
 export const prettyRecipe = (tableReturn: RawReturn[]): Recipe => {
@@ -32,14 +32,16 @@ export const prettyRecipe = (tableReturn: RawReturn[]): Recipe => {
         item: g.item,
       })).sort((a, b) => a.id - b.id),
     };
-    ingGroups.push(groups);
+    const exists = Boolean(groups.ingredients[0].id);
+    if (exists) ingGroups.push(groups);
   }
+
   const recipe: Recipe = {
-    id: tableReturn[0].id,
-    instructions: tableReturn[0].instructions,
-    name: tableReturn[0].name,
-    description: tableReturn[0].description,
-    notes: tableReturn[0].notes,
+    id: tableReturn[0]?.id,
+    instructions: tableReturn[0]?.instructions,
+    name: tableReturn[0]?.name,
+    description: tableReturn[0]?.description,
+    notes: tableReturn[0]?.notes,
     ingredientGroups: ingGroups,
   };
   return recipe;

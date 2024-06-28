@@ -2,6 +2,7 @@ import {ipcMain} from "electron";
 import {database} from "../index";
 import { RawReturn, prettyRecipe } from "../util/pretty-recipe";
 import { setQueryBuilder } from "../util/set-query-builder";
+import { RecipeReturn } from "../views/dashboard";
 
 // Might not be necessary? But just in case I want to use this elsewhere.
 export const recipeQuery = (id: number): string => `
@@ -10,6 +11,7 @@ export const recipeQuery = (id: number): string => `
   left join ingredientGroup ig on r.id=ig.recipeId
   left join ingredient i on i.ingredientGroupId=ig.id
   where r.id = ${id}
+  order by i.id;
 `;
 
 ipcMain.on("get-recipe", (event, arg: number) => {
@@ -39,5 +41,14 @@ ipcMain.on("update-ingredient", (event, arg: IngredientUpdates) => {
   `;
   database.all(sql, (err: Error, rows) => {
     event.reply("update-ingredient-return", (err && err.message) || rows);
+  });
+});
+
+ipcMain.on("create-recipe", (event, arg: string) => {
+  const createSql = `insert into recipe (name) values ("${arg}") returning id, name;`
+  database.get(createSql, (err, row: {id: number, name: string}) => {
+    console.log("what's going on here?", err, row);
+    if (err) return event.reply("create-error", err?.message);
+    event.reply("create-recipe-return", (err && err.message) || row);
   });
 });

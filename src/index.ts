@@ -1,4 +1,4 @@
-import {app, BrowserWindow, ipcMain, dialog} from 'electron';
+import {app, BrowserWindow, ipcMain} from 'electron';
 import sqlite from "sqlite3";
 import "./queries/recipe";
 import "./queries/folder";
@@ -13,7 +13,7 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
-
+// TODO: some initial setup for when a person first starts app. (create tables, etc.)
 export const database = new sqlite.Database("./public/db.sqlite3", err => {
   if (err) console.error("Database opening error: ", err);
 });

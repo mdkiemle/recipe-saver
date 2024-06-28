@@ -16,4 +16,23 @@ ipcMain.on("get-recipes-by-folderId", (event, arg: number) => {
   database.all(sql, (err: Error, rows) => {
     event.reply("recipes-in-folder", (err && err.message) || rows);
   });
+  
+});
+
+ipcMain.on("create-folder", (event, arg: string) => {
+  const createSql = `
+    INSERT into folder (name)
+    values ("${arg}")
+  `;
+  const querySql = "select * from folder";
+  console.log("are we here?", createSql);
+  database.serialize(() => {
+    database.run(createSql, (err) => {
+      console.log("we ran this shit", err);
+      if (err) event.reply("create-folder-error", err.message);
+    });
+    database.all(querySql, (err, rows) => {
+      event.reply("folders-get", (err && err.message) || rows);
+    });
+  });
 });

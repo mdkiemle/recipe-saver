@@ -14,6 +14,14 @@ export const recipeQuery = (id: number): string => `
   order by i.id;
 `;
 
+/**
+ * select instructions, folder.name as folderName
+from folder_recipe fr
+join recipe on recipe.id = fr.recipeId
+join folder on folder.id = fr.folderId
+where fr.folderId = 3;
+ */
+
 ipcMain.on("get-recipe", (event, arg: number) => {
   const sql = recipeQuery(arg);
   database.all(sql, (err: Error, rows: RawReturn[]) => {

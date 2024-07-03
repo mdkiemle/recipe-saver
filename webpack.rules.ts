@@ -34,6 +34,7 @@ export const rules: Required<ModuleOptions>['rules'] = [
       "style-loader",
       "css-loader",
       "sass-loader",
+      "postcss-loader",
     ],
   },
 ];

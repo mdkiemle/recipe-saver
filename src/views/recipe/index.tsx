@@ -16,16 +16,16 @@ const RecipePage = (): ReactElement => {
   };
 
   return (
-    <div>
+    <div className="container flex flex-col">
       <button onClick={doAnUpdate}>Click me for a surprise</button>
       {recipe && <>
-        <h2>{recipe.name}</h2>
+        <h2 className="text-2xl">{recipe.name}</h2>
         <div>
           {recipe?.description}
         </div>
         {recipe.ingredientGroups.map(ig => <section key={ig.id}>
-          <h3>{ig.groupName}</h3>
-          <ul>
+          <h3 className="text-xl">{ig.groupName}</h3>
+          <ul className="list-image-none">
             {ig.ingredients.map((ing, idx) => 
               <li key={ing.id}>
                 {ing.measurement} {ing.item}

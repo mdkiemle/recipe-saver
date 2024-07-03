@@ -3,6 +3,7 @@ import {ReactElement, useEffect, useState} from "react";
 import {Recipe} from "../../../src/models/recipe";
 import {useMount} from "../../../src/hooks/useMount";
 import { Link, NavLink } from "react-router-dom";
+import { CreateRecipeModal } from "../../modals/create-recipe-modal";
 
 export interface RecipeReturn {
   id: number;
@@ -39,14 +40,16 @@ const DashboardPage = (): ReactElement => {
   };
 
   return (
-    <div>
+    <div className="container md:mx-auto">
       Dashboard
-      {recipe.length && recipe.map(r => (
-        <div key={r.id}>
-          <Link to="recipe" state={r.id}>{r.name}</Link>
-        </div>
-      ))}
+
+      <div className="flex flex-col">
+        {recipe.length && recipe.map(r => (
+            <Link key={r.id} to="recipe" state={r.id} className="link">{r.name}</Link>
+        ))}
+      </div>
       <button onClick={create}>Create Recipe</button>
+      <CreateRecipeModal isOpen onClose={(): void => undefined}/>
     </div>
   );
 };

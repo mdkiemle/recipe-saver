@@ -23,3 +23,16 @@ export const createRecipe = (name: string): Promise<IdName> => {
     ipcRenderer.send("create-recipe", name);
   });
 }
+
+export const getRequest = <T, K>(reqName: string, resName: string, input: K): Promise<T> => {
+  return new Promise((resolve, reject) => {
+    ipcRenderer.once(resName, (e, args: T | string) => {
+      if (typeof args === "string") {
+        reject(args);
+      } else {
+        resolve(args);
+      }
+    });
+    ipcRenderer.send(reqName, input)
+  });
+}

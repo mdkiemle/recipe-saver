@@ -4,6 +4,7 @@ import {Recipe} from "../../../src/models/recipe";
 import {useMount} from "../../../src/hooks/useMount";
 import { Link, NavLink } from "react-router-dom";
 import { CreateRecipeModal } from "../../modals/create-recipe-modal";
+import { Button } from "@headlessui/react";
 
 export interface RecipeReturn {
   id: number;
@@ -13,6 +14,9 @@ export interface RecipeReturn {
 
 const DashboardPage = (): ReactElement => {
   const [recipe, setRecipe] = useState<RecipeReturn[]>([])
+  const [showCreate, setShowCreate] = useState(false);
+
+  const toggleShowCreate = (): void => setShowCreate(prev => !prev);
 
   useMount(() => {
     ipcRenderer.once("async-reply", (event, args: RecipeReturn[] | null) => {
@@ -28,28 +32,26 @@ const DashboardPage = (): ReactElement => {
     ipcRenderer.send("get-all-folders");
   });
 
-  const create = (): void => {
-    console.log("hey", recipe.length);
-    ipcRenderer.once("create-recipe-return", (e, args: RecipeReturn | string) => {
-      if (typeof args !== "string") {
-        console.log("and this?", [...recipe, args]);
-        setRecipe(prev => [...prev, args]);
-      }
-    });
-    ipcRenderer.send("create-recipe", "Hey Final test");
-  };
+  // const create = (): void => {
+  //   console.log("hey", recipe.length);
+  //   ipcRenderer.once("create-recipe-return", (e, args: RecipeReturn | string) => {
+  //     if (typeof args !== "string") {
+  //       console.log("and this?", [...recipe, args]);
+  //       setRecipe(prev => [...prev, args]);
+  //     }
+  //   });
+  //   ipcRenderer.send("create-recipe", "Hey Final test");
+  // };
 
   return (
     <div className="container md:mx-auto">
-      Dashboard
-
       <div className="flex flex-col">
         {recipe.length && recipe.map(r => (
-            <Link key={r.id} to="recipe" state={r.id} className="link">{r.name}</Link>
+          <Link key={r.id} to="recipe" state={r.id} className="link inline">{r.name}</Link>
         ))}
       </div>
-      <button onClick={create}>Create Recipe</button>
-      <CreateRecipeModal isOpen onClose={(): void => undefined}/>
+      <Button className="btn-primary" onClick={toggleShowCreate}>Hey click me</Button>
+      <CreateRecipeModal isOpen={showCreate} onClose={toggleShowCreate}/>
     </div>
   );
 };

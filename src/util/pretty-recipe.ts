@@ -1,7 +1,7 @@
 // Better typing coming soon
 
 import {groupBy} from "lodash";
-import {IngredientGroup, Recipe} from "../models/recipe";
+import {Ingredient, IngredientGroup, Recipe} from "../models/recipe";
 
 
 // Types file?
@@ -19,20 +19,24 @@ export interface RawReturn {
 }
 
 export const prettyRecipe = (tableReturn: RawReturn[]): Recipe => {
-  const uniqueGroups = groupBy(tableReturn, "groupName");
+  const uniqueGroups = groupBy(tableReturn, "groupId");
   const keys = Object.keys(uniqueGroups);
   const ingGroups: IngredientGroup[] = [];
   for (const key of keys) {
-    const groups = {
-      id: uniqueGroups[key][0].groupId,
-      groupName: uniqueGroups[key][0].groupName,
-      ingredients: uniqueGroups[key].map(g => ({
+    const ingT: Ingredient[] = uniqueGroups[key].flatMap(g => {
+      if (g.ingredientId) return {
         id: g.ingredientId,
         measurement: g.measurement,
         item: g.item,
-      })),
+      };
+      return [];
+    });
+    const groups = {
+      id: uniqueGroups[key][0].groupId,
+      groupName: uniqueGroups[key][0].groupName,
+      ingredients: ingT,
     };
-    const exists = Boolean(groups.ingredients[0].id);
+    const exists = Boolean(groups.groupName);
     if (exists) ingGroups.push(groups);
   }
 

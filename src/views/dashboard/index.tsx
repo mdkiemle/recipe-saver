@@ -3,6 +3,8 @@ import {ReactElement, useEffect, useState} from "react";
 import {Recipe} from "../../../src/models/recipe";
 import {useMount} from "../../../src/hooks/useMount";
 import { Link, NavLink } from "react-router-dom";
+import { CreateRecipeModal } from "../../modals/create-recipe-modal";
+import { Button } from "@headlessui/react";
 
 export interface RecipeReturn {
   id: number;
@@ -12,6 +14,9 @@ export interface RecipeReturn {
 
 const DashboardPage = (): ReactElement => {
   const [recipe, setRecipe] = useState<RecipeReturn[]>([])
+  const [showCreate, setShowCreate] = useState(false);
+
+  const toggleShowCreate = (): void => setShowCreate(prev => !prev);
 
   useMount(() => {
     ipcRenderer.once("async-reply", (event, args: RecipeReturn[] | null) => {
@@ -27,26 +32,26 @@ const DashboardPage = (): ReactElement => {
     ipcRenderer.send("get-all-folders");
   });
 
-  const create = (): void => {
-    console.log("hey", recipe.length);
-    ipcRenderer.once("create-recipe-return", (e, args: RecipeReturn | string) => {
-      if (typeof args !== "string") {
-        console.log("and this?", [...recipe, args]);
-        setRecipe(prev => [...prev, args]);
-      }
-    });
-    ipcRenderer.send("create-recipe", "Hey Final test");
-  };
+  // const create = (): void => {
+  //   console.log("hey", recipe.length);
+  //   ipcRenderer.once("create-recipe-return", (e, args: RecipeReturn | string) => {
+  //     if (typeof args !== "string") {
+  //       console.log("and this?", [...recipe, args]);
+  //       setRecipe(prev => [...prev, args]);
+  //     }
+  //   });
+  //   ipcRenderer.send("create-recipe", "Hey Final test");
+  // };
 
   return (
-    <div>
-      Dashboard
-      {recipe.length && recipe.map(r => (
-        <div key={r.id}>
-          <Link to="recipe" state={r.id}>{r.name}</Link>
-        </div>
-      ))}
-      <button onClick={create}>Create Recipe</button>
+    <div className="container md:mx-auto">
+      <div className="flex flex-col">
+        {recipe.length && recipe.map(r => (
+          <Link key={r.id} to="recipe" state={r.id} className="link inline">{r.name}</Link>
+        ))}
+      </div>
+      <Button className="btn-primary" onClick={toggleShowCreate}>Hey click me</Button>
+      <CreateRecipeModal isOpen={showCreate} onClose={toggleShowCreate}/>
     </div>
   );
 };

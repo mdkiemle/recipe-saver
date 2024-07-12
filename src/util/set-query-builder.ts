@@ -2,12 +2,14 @@ export interface KeyValue {
   [key: string]: string;
 }
 
-export const setQueryBuilder = (stuff: KeyValue): string => {
+export type KeysOfObj<T> = {
+  [K in keyof T]: string
+}
+
+export const setQueryBuilder = <T extends {}>(stuff: KeysOfObj<T>): string => {
   const values = [];
   for (const key in stuff) {
-    if (stuff[key]) {
-      values.push([`${key} = "${stuff[key]}"`])
-    }
+    values.push([`${key} = "${stuff[key]}"`])
   }
   const joinedStatement = values.join(", ");
   return joinedStatement;

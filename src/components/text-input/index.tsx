@@ -1,5 +1,6 @@
-import {ReactElement} from "react";
+import React, {ReactElement} from "react";
 import { Setter } from "../../models/setter";
+import { Field, Input, Label, _internal_ComponentInput } from "@headlessui/react";
 
 
 export interface TextInputProps {
@@ -10,15 +11,15 @@ export interface TextInputProps {
 }
 
 const TextInput = ({id, value, onChange, label}: TextInputProps): ReactElement => (
-  <div className="container flex flex-col">
-    {label && <label htmlFor={id}>{label}</label>}
-    <input
+  <Field className="grid grid-rows-2 max-w-md">
+    {label && <Label htmlFor={id}>{label}</Label>}
+    <Input
       id={id}
       value={value}
       className="px-4 py-2 rounded-md"
-      onChange={e => onChange(e.target.value)}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
     />
-  </div>
+  </Field>
 );
 
 export {TextInput};

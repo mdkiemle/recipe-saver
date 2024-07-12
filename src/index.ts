@@ -16,7 +16,7 @@ if (require('electron-squirrel-startup')) {
 // TODO: some initial setup for when a person first starts app. (create tables, etc.)
 export const database = new sqlite.Database("./public/db.sqlite3", err => {
   if (err) console.error("Database opening error: ", err);
-});
+}).exec("PRAGMA foreign_keys=ON");
 
 ipcMain.on("async-message", (event, arg) => {
   const sql = arg;
@@ -56,6 +56,7 @@ app.on('ready', createWindow);
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    database.close();
     app.quit();
   }
 });

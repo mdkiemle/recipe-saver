@@ -6,22 +6,19 @@ import {NavLink, Route, Routes} from "react-router-dom";
 import {DashboardPage} from "./views/dashboard";
 import {SearchPage} from "./views/search";
 import {RecipePage} from "./views/recipe";
-import { RecipeContextProvider } from "./context/RecipeContext";
+import {RecipeContextProvider} from "./context/RecipeContext";
+import {NavBar} from "./components/NavBar"
 
-const Main = (): ReactElement => {
-	return (
-    <div>
-      <NavLink to="/">Dashboard</NavLink>
-      <NavLink to="search">Search</NavLink>
-      <NavLink to="recipe">Recipe</NavLink>
-      <Routes>
-        <Route path="/" element={<DashboardPage />}/>
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/recipe" element={<RecipeContextProvider><RecipePage /> </RecipeContextProvider>} />
-        <Route path="/recipe/:recipeId" element={<RecipePage />} />
-      </Routes>
-    </div>
-	);
-};
+const Main = (): ReactElement => (
+  <div className="container">
+    <NavBar />
+    <Routes>
+      <Route path="/" element={<DashboardPage />}/>
+      <Route path="/search" element={<SearchPage />} />
+      <Route path="/recipe" element={<RecipeContextProvider><RecipePage /> </RecipeContextProvider>} />
+      <Route path="/recipe/:recipeId" element={<RecipePage />} />
+    </Routes>
+  </div>
+);
 
 export {Main};

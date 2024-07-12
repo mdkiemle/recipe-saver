@@ -3,7 +3,8 @@ import {database} from "../index";
 import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
 import {RecipeReturn} from "../views/dashboard";
-import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars} from "../models/recipe";
+import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates} from "../models/recipe";
+import { returnValues } from "../util/sql-returning";
 
 
 // Might not be necessary? But just in case I want to use this elsewhere.
@@ -32,17 +33,32 @@ ipcMain.on("get-recipe", (event, arg: number) => {
   });
 });
 
+ipcMain.on("update-recipe", (event, {id, updates}: RecipeUpdates) => {
+  console.log("what this", updates);
+  const setQuery = setQueryBuilder(updates);
+  const returning = returnValues(updates);
+  console.log("update recipe stuff", setQuery, returning);
+  if (!(setQuery && returning)) return event.reply("update-recipe-return", "No update made");
+  const sql = `
+    update recipe
+    set ${setQuery}
+    where id = ${id}
+    returning id, ${returning};
+  `;
+  database.get(sql, (err, row) => {
+    event.reply("update-recipe-return", (err && err.message) || row);
+  });
+});
 
-
-ipcMain.on("update-ingredient", (event, {id, item, measurement}: IngredientUpdates) => {
-  const keyValues = {item, measurement};
-  const setQuery = setQueryBuilder(keyValues);
-  if (!setQuery) return event.reply("update-ingredient-return", "No update made");
+ipcMain.on("update-ingredient", (event, {id, updates}: IngredientUpdates) => {
+  const setQuery = setQueryBuilder(updates);
+  const returning = returnValues(updates);
+  if (!(setQuery && returning)) return event.reply("update-ingredient-return", "No update made");
   const sql = `
     update ingredient
     set ${setQuery}
     where id = ${id}
-    returning *;
+    returning id, ingredientGroupId, ${returning};
   `;
   database.get(sql, (err: Error, row) => {
     event.reply("update-ingredient-return", (err && err.message) || row);
@@ -54,31 +70,6 @@ ipcMain.on("create-recipe", (event, arg: string) => {
   database.get(createSql, (err, row: {id: number, name: string}) => {
     if (err) return event.reply("create-error", err?.message);
     event.reply("create-recipe-return", (err && err.message) || row);
-  });
-});
-
-ipcMain.on("update-description", (event, {id, text}: RecipeTextUpdate) => {
-  const updateSql = `
-    update recipe
-    set description = "${text}"
-    where id = ${id}
-    returning id, description;
-  `;
-  database.get(updateSql, (err, row) => {
-    console.log("testing", row);
-    event.reply("update-description-return", (err && err.message) || row);
-  });
-});
-
-ipcMain.on("update-instructions", (event, {id, text}: RecipeTextUpdate) => {
-  const updateSql = `
-    update recipe
-    set instructions = "${text}"
-    where id = ${id}
-    returning id, instructions;
-  `;
-  database.get(updateSql, (err, row) => {
-    event.reply("update-instructions-return", (err && err.message) || row);
   });
 });
 
@@ -115,7 +106,42 @@ ipcMain.on("add-ingredient", (event, {ingredientGroupId, item, measurement}: Add
     returning *;
   `;
   database.get(addSql, (err, row) => {
-    console.log("new ingredient?", row);
     event.reply("add-ingredient-return", (err && err.message) || row);
+  });
+});
+
+ipcMain.on("delete-recipe", (event, id: number) => {
+  const deleteSql = `
+    delete from recipe
+    where id =${id}
+    returning id;
+  `;
+  database.get(deleteSql, (err, row) => {
+    event.reply("delete-recipe-return");
+  });
+});
+
+ipcMain.on("delete-ingredient", (event, id: number) => {
+  const deleteSql = `
+    delete from ingredient
+    where id = ${id}
+    returning id, ingredientGroupId;
+  `;
+  database.get(deleteSql, (err, row) => {
+    console.log("huh", row);
+    event.reply("delete-ingredient-return", (err && err.message) || row);
+  });
+});
+
+ipcMain.on("delete-ingredientGroup", (event, id: number) => {
+  console.log("what's going on here", id);
+  const deleteSql = `
+    delete from ingredientGroup
+    where id = ${id}
+    returning id;
+  `;
+  database.get(deleteSql, (err, row) => {
+    console.log("deleted ingGroup id", row);
+    event.reply("delete-ingredientGroup-return", (err && err.message) || row);
   });
 });

@@ -1,8 +1,9 @@
-import {Description, Dialog, DialogPanel, DialogTitle, Menu, MenuButton, MenuItem, MenuItems, DialogBackdrop, Button} from "@headlessui/react";
+import {Dialog, DialogPanel, DialogTitle, DialogBackdrop, Button} from "@headlessui/react";
 import { ReactElement, useState } from "react";
 import {TextInput} from "../../components/text-input";
-import { createRecipe } from "../../messaging/send";
+import {getRequest } from "../../messaging/send";
 import { useNavigate } from "react-router";
+import { IdName } from "../../models/generic";
 
 export interface CreateRecipeModalProps {
   isOpen: boolean;
@@ -16,14 +17,14 @@ const CreateRecipeModal = ({isOpen, onClose}: CreateRecipeModalProps): ReactElem
 
   const handleCreate = (): void => {
     setIsLoading(true);
-    createRecipe(name).then(result => {
+    getRequest<IdName, string>("create-recipe", "create-recipe-return", name).then(result => {
       console.log("what is this result?", result);
       setIsLoading(false);
       nav("/recipe", {state: result.id});
     }).catch(err => {
       console.error("something happened: ", err);
-    });
-  }
+    });;
+  };
 
   return (
     <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={onClose}>

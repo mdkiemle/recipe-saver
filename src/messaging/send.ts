@@ -11,19 +11,6 @@ export const send = (reqName: string, message: string): Promise<any> => {
   }));
 };
 
-export const createRecipe = (name: string): Promise<IdName> => {
-  return new Promise((resolve, reject) => {
-    ipcRenderer.once("create-recipe-return", (e, args: IdName | string) => {
-      if (typeof args === "string") {
-        reject(args);
-      } else {
-        resolve(args);
-      }
-    });
-    ipcRenderer.send("create-recipe", name);
-  });
-}
-
 export const getRequest = <T, K>(reqName: string, resName: string, input: K): Promise<T> => {
   return new Promise((resolve, reject) => {
     ipcRenderer.once(resName, (e, args: T | string) => {
@@ -35,4 +22,4 @@ export const getRequest = <T, K>(reqName: string, resName: string, input: K): Pr
     });
     ipcRenderer.send(reqName, input)
   });
-}
+};

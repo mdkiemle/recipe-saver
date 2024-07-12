@@ -6,7 +6,7 @@ export const setup = (db: sqlite.Database): void => {
 			CREATE TABLE IF NOT EXISTS folder (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				name TEXT NOT NULL
-			);
+			)
 		`);
 		db.run(`
 			CREATE TABLE IF NOT EXISTS recipe (
@@ -14,10 +14,19 @@ export const setup = (db: sqlite.Database): void => {
 				name TEXT NOT NULL,
 				description TEXT,
 				notes TEXT,
-				folderId INTEGER,
+				instructions TEXT
+			)
+		`);
+		db.run(`
+			CREATE TABLE IF NOT EXISTS folderRecipe (
+				folderId INTEGER NOT NULL,
+				recipeId INTEGER NOT NULL,
 				FOREIGN KEY (folderId)
-					REFERENCES folder (id)
-			);
+					REFERENCES folder (id),
+				FOREIGN KEY (recipeId)
+					REFERENCES recipe (id)
+				CONSTRAINT PK_folder PRIMARY KEY (recipeId, folderId)
+			)
 		`);
 		db.run(`
 			CREATE TABLE IF NOT EXISTS ingredientGroup (
@@ -26,6 +35,7 @@ export const setup = (db: sqlite.Database): void => {
 				recipeId INTEGER,
 				FOREIGN KEY (recipeId)
 					REFERENCES recipe (id)
+					ON DELETE CASCADE
 			)
 		`);
 		db.run(`
@@ -36,7 +46,8 @@ export const setup = (db: sqlite.Database): void => {
 				ingredientGroupId INTEGER,
 				FOREIGN KEY (ingredientGroupId)
 					REFERENCES ingredientGroup (id)
-			);
+					ON DELETE CASCADE
+			)
 		`);
 	});
 }

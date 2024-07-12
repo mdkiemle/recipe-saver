@@ -2,7 +2,6 @@ import {ipcMain} from "electron";
 import {database} from "../index";
 import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
-import {RecipeReturn} from "../views/dashboard";
 import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates} from "../models/recipe";
 import { returnValues } from "../util/sql-returning";
 

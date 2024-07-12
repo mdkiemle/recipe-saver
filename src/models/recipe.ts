@@ -15,6 +15,14 @@ export interface IngredientGroup extends RawIngredientGroup {
   ingredients: Ingredient[];
 }
 
+/**
+ * Returns the id and name of the recipe, and includes the item
+ * and measurements of the ingredient
+ */
+export interface SearchReturn {
+  id: number;
+}
+
 export interface BaseRecipe {
   id: number;
   name: string;

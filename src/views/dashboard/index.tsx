@@ -6,10 +6,13 @@ import { Link, NavLink } from "react-router-dom";
 import { CreateRecipeModal } from "../../modals/create-recipe-modal";
 import { Button } from "@headlessui/react";
 import { SearchInput } from "../../components/SearchInput";
+import { getRequest } from "../../messaging/send";
 
 export interface RecipeReturn {
   id: number;
   name: string;
+  item?: string;
+  measurement?: string;
 }
 
 
@@ -44,9 +47,18 @@ const DashboardPage = (): ReactElement => {
   //   ipcRenderer.send("create-recipe", "Hey Final test");
   // };
 
+  const handleSearch = (item: string): void => {
+    console.log("inside handleSearch", item);
+    getRequest<RecipeReturn[], string>("search", "search-return", item)
+    .then(res => {
+      console.log("Uhh excuse me", res);
+      setRecipe(res);
+    });
+  }
+
   return (
     <div className="container md:mx-auto">
-      <SearchInput />
+      <SearchInput onEnter={handleSearch}/>
       <div className="flex flex-col">
         {recipe.length && recipe.map(r => (
           <Link key={r.id} to="recipe" state={r.id} className="link inline">{r.name}</Link>

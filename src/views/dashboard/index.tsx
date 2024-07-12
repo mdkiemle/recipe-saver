@@ -5,6 +5,7 @@ import {useMount} from "../../../src/hooks/useMount";
 import { Link, NavLink } from "react-router-dom";
 import { CreateRecipeModal } from "../../modals/create-recipe-modal";
 import { Button } from "@headlessui/react";
+import { SearchInput } from "../../components/SearchInput";
 
 export interface RecipeReturn {
   id: number;
@@ -45,6 +46,7 @@ const DashboardPage = (): ReactElement => {
 
   return (
     <div className="container md:mx-auto">
+      <SearchInput />
       <div className="flex flex-col">
         {recipe.length && recipe.map(r => (
           <Link key={r.id} to="recipe" state={r.id} className="link inline">{r.name}</Link>

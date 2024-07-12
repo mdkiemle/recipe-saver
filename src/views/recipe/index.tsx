@@ -32,18 +32,18 @@ const RecipePage = (): ReactElement => {
     });
   };
 
-  const handleDelete = (): void => {
-    getRequest<{id: number}, number>("delete-recipe", "delete-recipe-return", recipe.id)
-    .then(res => {
-      console.log("Hey?", res);
-      nav(-1);
-    });
-  };
+  // const handleDelete = (): void => {
+  //   getRequest<{id: number}, number>("delete-recipe", "delete-recipe-return", recipe.id)
+  //   .then(res => {
+  //     console.log("Hey?", res);
+  //     nav(-1);
+  //   });
+  // };
 
   return (
     <div className="container flex flex-col gap-4">
       {!loading && recipe && <>
-        <PiTrash onClick={handleDelete} className="cursor-pointer"/>
+        {/* <PiTrash onClick={handleDelete} className="cursor-pointer"/> */}
         <Card className="container flex flex-row">
           {/* <h1 className="text-2xl">{recipe.name}</h1> */}
           <ToggleInput

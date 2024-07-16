@@ -35,6 +35,10 @@ export interface Recipe extends BaseRecipe {
   ingredientGroups: IngredientGroup[];
 }
 
+export interface SearchRecipe extends BaseRecipe {
+  ingredients: Ingredient[];
+}
+
 export interface Folder {
   id: number;
   name: string;
@@ -52,14 +56,6 @@ export interface RawJoinRecipe {
   notes: string;
   recipeId: number;
 }
-
-// export interface RecipeUpdates {
-//   id: number;
-//   name?: string;
-//   instructions?: string;
-//   notes?: string;
-//   description?: string; 
-// }
 
 export interface RecipeUpdateVars {
   name: string;

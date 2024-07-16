@@ -25,6 +25,13 @@ join folder on folder.id = fr.folderId
 where fr.folderId = 3;
  */
 
+ipcMain.on("get-recipes", (event) => {
+  const sql = "select id, name, description from recipe";
+  database.all(sql, (err: Error, rows: RecipeReturn) => {
+    event.reply("get-recipes-return", (err && err.message) || rows);
+  });
+});
+
 ipcMain.on("get-recipe", (event, arg: number) => {
   const sql = recipeQuery(arg);
   database.all(sql, (err: Error, rows: RawReturn[]) => {

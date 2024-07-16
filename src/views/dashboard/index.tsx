@@ -1,32 +1,45 @@
 import {ipcRenderer } from "electron";
-import {ReactElement, useEffect, useState} from "react";
-import {Recipe} from "../../../src/models/recipe";
+import {ReactElement, useContext, useEffect, useState} from "react";
+import {Recipe, SearchRecipe} from "../../../src/models/recipe";
 import {useMount} from "../../../src/hooks/useMount";
 import { Link, NavLink } from "react-router-dom";
 import { CreateRecipeModal } from "../../modals/create-recipe-modal";
 import { Button } from "@headlessui/react";
-import { SearchInput } from "../../components/SearchInput";
 import { getRequest } from "../../messaging/send";
+import { RecipeCard } from "../../components/RecipeCard";
+import { Search } from "../../components/Search";
+import { DashboardContext } from "../../context/DashboardContext";
 
 export interface RecipeReturn {
   id: number;
   name: string;
+  description?: string
   item?: string;
   measurement?: string;
 }
 
 
 const DashboardPage = (): ReactElement => {
-  const [recipe, setRecipe] = useState<RecipeReturn[]>([])
+  const [recipe, setRecipe] = useState<SearchRecipe[]>([])
   const [showCreate, setShowCreate] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const {setActiveSearch} = useContext(DashboardContext);
 
   const toggleShowCreate = (): void => setShowCreate(prev => !prev);
 
-  useMount(() => {
-    ipcRenderer.once("async-reply", (event, args: RecipeReturn[] | null) => {
-      if (args) setRecipe(args);
+  const initialRequest = (): void => {
+    getRequest<SearchRecipe[], undefined>("get-recipes", "get-recipes-return", undefined)
+    .then(res => {
+      setRecipe(res);
     });
-    ipcRenderer.send("async-message", "SELECT id, name FROM recipe")
+  }
+
+  useMount(() => {
+    initialRequest();
+    // ipcRenderer.once("async-reply", (event, args: RecipeReturn[] | null) => {
+    //   if (args) setRecipe(args);
+    // });
+    // ipcRenderer.send("async-message", "SELECT id, name FROM recipe")
   });
 
   useMount(() => {
@@ -36,32 +49,27 @@ const DashboardPage = (): ReactElement => {
     ipcRenderer.send("get-all-folders");
   });
 
-  // const create = (): void => {
-  //   console.log("hey", recipe.length);
-  //   ipcRenderer.once("create-recipe-return", (e, args: RecipeReturn | string) => {
-  //     if (typeof args !== "string") {
-  //       console.log("and this?", [...recipe, args]);
-  //       setRecipe(prev => [...prev, args]);
-  //     }
-  //   });
-  //   ipcRenderer.send("create-recipe", "Hey Final test");
-  // };
-
   const handleSearch = (item: string): void => {
-    console.log("inside handleSearch", item);
-    getRequest<RecipeReturn[], string>("search", "search-return", item)
+    setSearching(true);
+    setActiveSearch(true);
+    getRequest<SearchRecipe[], string>("search", "search-return", item)
     .then(res => {
-      console.log("Uhh excuse me", res);
       setRecipe(res);
+      setSearching(false);
     });
-  }
+  };
+
+  const handleReset = (): void => {
+    setActiveSearch(false);
+    initialRequest();
+  };
 
   return (
     <div className="container md:mx-auto">
-      <SearchInput onEnter={handleSearch}/>
-      <div className="flex flex-col">
-        {recipe.length && recipe.map(r => (
-          <Link key={r.id} to="recipe" state={r.id} className="link inline">{r.name}</Link>
+      <Search handleSearch={handleSearch} handleReset={handleReset} resultCount={recipe.length}/>
+      <div className="grid grid-cols-3 gap-2 grid-flow-row-dense">
+        {recipe?.map(r => (
+          <RecipeCard key={r.id} recipe={r}/>
         ))}
       </div>
       <Button className="btn-primary" onClick={toggleShowCreate}>Hey click me</Button>

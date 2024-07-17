@@ -42,7 +42,6 @@ export interface SearchRecipe extends BaseRecipe {
 export interface Folder {
   id: number;
   name: string;
-  recipes: number[];
 }
 
 export interface RawJoinRecipe {

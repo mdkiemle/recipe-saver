@@ -4,6 +4,7 @@ import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
 import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates} from "../models/recipe";
 import { returnValues } from "../util/sql-returning";
+import { RecipeReturn } from "../views/dashboard";
 
 
 // Might not be necessary? But just in case I want to use this elsewhere.
@@ -28,6 +29,13 @@ ipcMain.on("get-recipes", (event) => {
   const sql = "select id, name, description from recipe";
   database.all(sql, (err: Error, rows: RecipeReturn) => {
     event.reply("get-recipes-return", (err && err.message) || rows);
+  });
+});
+
+ipcMain.on("get-recipes-no-folder", (event) => {
+  const sql = "select id, name, description from recipe r left join folderRecipe fr on fr.recipeId = r.id where fr.recipeId is null"
+  database.all(sql, (err, rows) => {
+    event.reply("get-recipes-no-folder-return", (err && err.message) || rows);
   });
 });
 

@@ -13,7 +13,7 @@ export interface RecipeCardProps {
 
 const RecipeCard = ({recipe: r}: RecipeCardProps): ReactElement => (
   <Card>
-    <Link key={r.id} to="recipe" state={r.id} className="link inline">{r.name}</Link>
+    <Link key={r.id} to="recipe" state={r.id} className="link text-lg">{r.name}</Link>
     {r.ingredients?.length && <div className="container flex flex-col">
       <span className="text-green-500">Matches:</span>
       {r.ingredients?.map(i => <span key={i.id}>{i.measurement} {i.item}</span>)} 

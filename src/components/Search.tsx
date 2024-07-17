@@ -1,4 +1,4 @@
-import React, {ReactElement, useContext, useState} from "react";
+import React, {ReactElement, useContext, useEffect, useState} from "react";
 import { SearchInput } from "./SearchInput";
 import { DashboardContext } from "../context/DashboardContext";
 
@@ -9,12 +9,16 @@ export interface SearchProps {
 }
 
 const Search = ({handleSearch, handleReset, resultCount}: SearchProps): ReactElement => {
-  const {search, setSearch, activeSearch} = useContext(DashboardContext);
+  const {search, setSearch, activeSearch, folder} = useContext(DashboardContext);
 
   const resetSearch = (): void => {
     setSearch("");
     handleReset();
   };
+
+  useEffect(() => {
+    resetSearch();
+  }, [folder.id]);
 
   return (
     <div>

@@ -7,12 +7,12 @@ import {getRequest} from "../../messaging/send";
 import { IngredientGroupSection } from "../../components/IngredientGroupSection";
 import { Card } from "../../components/Card";
 import { ToggleInput } from "../../components/ToggleInput";
-import { PiTrash } from "react-icons/pi";
-import { useNavigate } from "react-router";
+// import { PiTrash } from "react-icons/pi";
+// import { useNavigate } from "react-router";
 
 const RecipePage = (): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing} = useContext(RecipeContext);
-  const nav = useNavigate();
+  // const nav = useNavigate();
 
   const handleUpdateRecipe = (updates: Partial<RecipeUpdateVars>): void => {
     let x = updates?.name;
@@ -31,14 +31,6 @@ const RecipePage = (): ReactElement => {
       dispatch({type: "ADD_ING_GROUP", payload: res});
     });
   };
-
-  // const handleDelete = (): void => {
-  //   getRequest<{id: number}, number>("delete-recipe", "delete-recipe-return", recipe.id)
-  //   .then(res => {
-  //     console.log("Hey?", res);
-  //     nav(-1);
-  //   });
-  // };
 
   return (
     <div className="container flex flex-col gap-4">

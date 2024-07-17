@@ -1,14 +1,17 @@
 import {ipcRenderer } from "electron";
 import {ReactElement, useContext, useEffect, useState} from "react";
-import {Recipe, SearchRecipe} from "../../../src/models/recipe";
+import {Folder, Recipe, SearchRecipe} from "../../../src/models/recipe";
 import {useMount} from "../../../src/hooks/useMount";
-import { Link, NavLink } from "react-router-dom";
 import { CreateRecipeModal } from "../../modals/create-recipe-modal";
 import { Button } from "@headlessui/react";
 import { getRequest } from "../../messaging/send";
 import { RecipeCard } from "../../components/RecipeCard";
 import { Search } from "../../components/Search";
 import { DashboardContext } from "../../context/DashboardContext";
+import { FolderItem } from "../../components/FolderItem";
+import { FolderNav } from "../../components/FolderNav";
+import { FolderContext } from "../../context/FolderContext";
+import { NoFolderSection } from "../../components/NoFolderSection";
 
 export interface RecipeReturn {
   id: number;
@@ -20,57 +23,52 @@ export interface RecipeReturn {
 
 
 const DashboardPage = (): ReactElement => {
-  const [recipe, setRecipe] = useState<SearchRecipe[]>([])
+  const [recipe, setRecipe] = useState<SearchRecipe[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [searching, setSearching] = useState(false);
-  const {setActiveSearch} = useContext(DashboardContext);
+  const {setActiveSearch, activeSearch, folder, setFolder} = useContext(DashboardContext);
+  const {folders} = useContext(FolderContext)
 
   const toggleShowCreate = (): void => setShowCreate(prev => !prev);
 
-  const initialRequest = (): void => {
-    getRequest<SearchRecipe[], undefined>("get-recipes", "get-recipes-return", undefined)
+  const getByFolder = (): void => {
+    getRequest<SearchRecipe[], number>("get-recipes-by-folderId", "get-recipes-by-folderId-return", folder.id)
     .then(res => {
       setRecipe(res);
     });
-  }
-
-  useMount(() => {
-    initialRequest();
-    // ipcRenderer.once("async-reply", (event, args: RecipeReturn[] | null) => {
-    //   if (args) setRecipe(args);
-    // });
-    // ipcRenderer.send("async-message", "SELECT id, name FROM recipe")
-  });
-
-  useMount(() => {
-    ipcRenderer.once("folders-get", (event, arg) => {
-      console.log("folders get", arg);
-    });
-    ipcRenderer.send("get-all-folders");
-  });
+  };
 
   const handleSearch = (item: string): void => {
     setSearching(true);
     setActiveSearch(true);
-    getRequest<SearchRecipe[], string>("search", "search-return", item)
+    getRequest<SearchRecipe[], [string, number?]>("search", "search-return", [item, folder?.id])
     .then(res => {
       setRecipe(res);
       setSearching(false);
     });
   };
 
+  useEffect(() => {
+    if (folder.id === 0) return;
+    getByFolder();
+  }, [folder.id])
+
   const handleReset = (): void => {
     setActiveSearch(false);
-    initialRequest();
+    if (folder.id === 0) return setRecipe([]);
+    getByFolder();
   };
 
   return (
     <div className="container md:mx-auto">
       <Search handleSearch={handleSearch} handleReset={handleReset} resultCount={recipe.length}/>
+      <FolderNav />
       <div className="grid grid-cols-3 gap-2 grid-flow-row-dense">
+        {!folder.id && !activeSearch && folders?.map(f => <FolderItem key={f.id} folder={f} onClick={setFolder}/>)}
         {recipe?.map(r => (
           <RecipeCard key={r.id} recipe={r}/>
         ))}
+        <NoFolderSection show={!folder.id && !activeSearch}/>
       </div>
       <Button className="btn-primary" onClick={toggleShowCreate}>Hey click me</Button>
       <CreateRecipeModal isOpen={showCreate} onClose={toggleShowCreate}/>

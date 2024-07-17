@@ -43,7 +43,7 @@ const RecipeContext = createContext<BaseRecipeContext>({
   loading: false,
 });
 
-const recipeReducer = (state: Recipe, action: Action) => {
+const recipeReducer = (state: Recipe, action: Action): Recipe => {
   switch(action.type) {
     case "UPDATE_RECIPE":
       return updateObject(state, {

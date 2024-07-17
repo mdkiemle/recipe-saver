@@ -21,12 +21,12 @@ const Search = ({handleSearch, handleReset, resultCount}: SearchProps): ReactEle
   }, [folder.id]);
 
   return (
-    <div>
+    <div className="flex-1">
       <SearchInput onEnter={handleSearch} search={search} setSearch={setSearch}/>
       <div className="container h-8 flex gap-2 items-center">
       {resultCount >= 0 && activeSearch && 
         <>
-          <span className="text-orange-800">Showing {resultCount} results for &quot;{search}&quot;</span>
+          <span className="text-orange-800">Showing {resultCount} results for &quot;{activeSearch}&quot;</span>
           <button onClick={resetSearch} className="link">Clear results</button>
         </>
       }

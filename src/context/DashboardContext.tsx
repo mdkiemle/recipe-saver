@@ -8,8 +8,8 @@ export interface BaseDashboardContext {
   folder: Folder;
   setFolder: Setter<Folder>;
   // Normally might do something like with search query in url, but this feels fine
-  activeSearch: boolean;
-  setActiveSearch: Setter<boolean>;
+  activeSearch: string;
+  setActiveSearch: Setter<string>;
 }
 
 export interface DashboardContextProps {
@@ -21,14 +21,14 @@ const DashboardContext = createContext<BaseDashboardContext>({
   setSearch: () => undefined,
   folder: {id: 0, name: ""},
   setFolder: () => undefined,
-  activeSearch: false,
+  activeSearch: "",
   setActiveSearch: () => undefined,
 });
 
 const DashboardContextProvider = (props: DashboardContextProps): ReactElement => {
   const [search, setSearch] = useState("");
   const [folder, setFolder] = useState<Folder>({id: 0, name: ""});
-  const [activeSearch, setActiveSearch] = useState(false);
+  const [activeSearch, setActiveSearch] = useState("");
   return (
     <DashboardContext.Provider value={{search, setSearch, folder, setFolder, activeSearch, setActiveSearch}}>
       {props.children}

@@ -26,10 +26,16 @@ const NoFolderSection = ({show}: NoFolderSectionProps): ReactElement | undefined
   });
 
   
-  return (
-    <>
-    {show && recipe?.map(r => <RecipeCard key={r.id} recipe={r}/>)}
+  return (<>
+  {
+    show && <>
+      <h3 className="text-lg">Unfolder&apos;d</h3>
+      <div className="grid grid-cols-3 gap-2 grid-flow-row-dense">
+        {recipe?.map(r => <RecipeCard key={r.id} recipe={r}/>)}
+      </div>
     </>
+  }
+  </>
   );
 };
 

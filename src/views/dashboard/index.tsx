@@ -12,6 +12,8 @@ import { FolderItem } from "../../components/FolderItem";
 import { FolderNav } from "../../components/FolderNav";
 import { FolderContext } from "../../context/FolderContext";
 import { NoFolderSection } from "../../components/NoFolderSection";
+import { CreateFolderModal } from "../../modals/create-folder-modal";
+import { PiChefHat, PiFolder, PiFolderFill } from "react-icons/pi";
 
 export interface RecipeReturn {
   id: number;
@@ -24,12 +26,14 @@ export interface RecipeReturn {
 
 const DashboardPage = (): ReactElement => {
   const [recipe, setRecipe] = useState<SearchRecipe[]>([]);
-  const [showCreate, setShowCreate] = useState(false);
+  const [showCreateRecipe, setShowCreateRecipe] = useState(false);
+  const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [searching, setSearching] = useState(false);
   const {setActiveSearch, activeSearch, folder, setFolder} = useContext(DashboardContext);
   const {folders} = useContext(FolderContext)
 
-  const toggleShowCreate = (): void => setShowCreate(prev => !prev);
+  const toggleShowCreateRecipe = (): void => setShowCreateRecipe(prev => !prev);
+  const toggleShowCreateFolder = (): void => setShowCreateFolder(prev => !prev);
 
   const getByFolder = (): void => {
     getRequest<SearchRecipe[], number>("get-recipes-by-folderId", "get-recipes-by-folderId-return", folder.id)
@@ -40,7 +44,7 @@ const DashboardPage = (): ReactElement => {
 
   const handleSearch = (item: string): void => {
     setSearching(true);
-    setActiveSearch(true);
+    setActiveSearch(item);
     getRequest<SearchRecipe[], [string, number?]>("search", "search-return", [item, folder?.id])
     .then(res => {
       setRecipe(res);
@@ -54,24 +58,32 @@ const DashboardPage = (): ReactElement => {
   }, [folder.id])
 
   const handleReset = (): void => {
-    setActiveSearch(false);
+    setActiveSearch("");
     if (folder.id === 0) return setRecipe([]);
     getByFolder();
   };
 
   return (
     <div className="container md:mx-auto">
-      <Search handleSearch={handleSearch} handleReset={handleReset} resultCount={recipe.length}/>
+      <header className="flex gap-2">
+        <Search handleSearch={handleSearch} handleReset={handleReset} resultCount={recipe.length}/>
+        <Button className="btn-primary self-start" onClick={toggleShowCreateRecipe}>
+          <PiChefHat />Create Recipe
+        </Button>
+        <Button className="btn-secondary self-start" onClick={toggleShowCreateFolder}>
+          <PiFolderFill/> Create Folder
+        </Button>
+      </header>
       <FolderNav />
       <div className="grid grid-cols-3 gap-2 grid-flow-row-dense">
         {!folder.id && !activeSearch && folders?.map(f => <FolderItem key={f.id} folder={f} onClick={setFolder}/>)}
         {recipe?.map(r => (
           <RecipeCard key={r.id} recipe={r}/>
         ))}
-        <NoFolderSection show={!folder.id && !activeSearch}/>
       </div>
-      <Button className="btn-primary" onClick={toggleShowCreate}>Hey click me</Button>
-      <CreateRecipeModal isOpen={showCreate} onClose={toggleShowCreate}/>
+      <NoFolderSection show={!folder.id && !activeSearch}/>
+      <CreateRecipeModal isOpen={showCreateRecipe} onClose={toggleShowCreateRecipe}/>
+      <CreateFolderModal isOpen={showCreateFolder} onClose={toggleShowCreateFolder}/>
     </div>
   );
 };

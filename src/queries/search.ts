@@ -21,11 +21,9 @@ const withFolderSearch = (search: string, id: number): string => `
 `;
 
 ipcMain.on("search", (event, arg: [string, number?]) => {
-  console.log("we made it into search", arg);
   const [searchVal, folderId] = arg;
   const sql = folderId ? withFolderSearch(searchVal, folderId) : noFolderSearch(searchVal)
   database.all(sql, (err, rows: SearchRecipeRawReturn[]) => {
-    console.log("Here ya go!", rows);
     const recipes = prettySearch(rows);
     event.reply("search-return", (err && err.message) || recipes);
   });

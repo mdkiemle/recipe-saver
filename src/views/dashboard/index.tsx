@@ -1,7 +1,5 @@
-import {ipcRenderer } from "electron";
 import {ReactElement, useContext, useEffect, useState} from "react";
-import {Folder, Recipe, SearchRecipe} from "../../../src/models/recipe";
-import {useMount} from "../../../src/hooks/useMount";
+import {SearchRecipe} from "../../../src/models/recipe";
 import { CreateRecipeModal } from "../../modals/create-recipe-modal";
 import { Button } from "@headlessui/react";
 import { getRequest } from "../../messaging/send";
@@ -13,7 +11,7 @@ import { FolderNav } from "../../components/FolderNav";
 import { FolderContext } from "../../context/FolderContext";
 import { NoFolderSection } from "../../components/NoFolderSection";
 import { CreateFolderModal } from "../../modals/create-folder-modal";
-import { PiChefHat, PiFolder, PiFolderFill } from "react-icons/pi";
+import { PiChefHat, PiFolderFill } from "react-icons/pi";
 
 export interface RecipeReturn {
   id: number;
@@ -68,7 +66,7 @@ const DashboardPage = (): ReactElement => {
       <header className="flex gap-2">
         <Search handleSearch={handleSearch} handleReset={handleReset} resultCount={recipe.length}/>
         <Button className="btn-primary self-start" onClick={toggleShowCreateRecipe}>
-          <PiChefHat />Create Recipe
+          <PiChefHat /> Create Recipe
         </Button>
         <Button className="btn-secondary self-start" onClick={toggleShowCreateFolder}>
           <PiFolderFill/> Create Folder
@@ -82,7 +80,7 @@ const DashboardPage = (): ReactElement => {
         ))}
       </div>
       <NoFolderSection show={!folder.id && !activeSearch}/>
-      <CreateRecipeModal isOpen={showCreateRecipe} onClose={toggleShowCreateRecipe}/>
+      <CreateRecipeModal isOpen={showCreateRecipe} onClose={toggleShowCreateRecipe} folderId={folder.id}/>
       <CreateFolderModal isOpen={showCreateFolder} onClose={toggleShowCreateFolder}/>
     </div>
   );

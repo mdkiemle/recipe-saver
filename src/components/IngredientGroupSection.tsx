@@ -18,7 +18,6 @@ const IngredientGroupSection = ({ingredientGroup: {id, ingredients, groupName}}:
   const handleChangeGroup = (text: string): void => {
     getRequest<{id: number, groupName: string}, RecipeTextUpdate>("update-groupName", "update-groupName-return", {id, text})
     .then(res => {
-      console.log("We got a response", res);
       dispatch({type: "UPDATE_GROUPNAME", payload: res})
     }).catch(err => {
       console.log("Problem editing name: ", err);
@@ -28,7 +27,6 @@ const IngredientGroupSection = ({ingredientGroup: {id, ingredients, groupName}}:
   const handleAddIngredient = (): void => {
     getRequest<AddIngredientReturn, AddIngredientVars>("add-ingredient", "add-ingredient-return", {item: "New item", measurement: "(Measurements)", ingredientGroupId: id})
     .then(res => {
-      console.log("add ingredient response", res);
       dispatch({type:"ADD_INGREDIENT", payload: res})
     }).catch(err => {
       console.log("Uh oh! ", err);
@@ -38,7 +36,6 @@ const IngredientGroupSection = ({ingredientGroup: {id, ingredients, groupName}}:
   const handleDeleteGroup = (): void => {
     getRequest<DeleteGroupReturn, number>("delete-ingredientGroup", "delete-ingredientGroup-return", id)
     .then(res => {
-      console.log("This was deleted", res);
       dispatch({type: "DELETE_GROUP", payload: res});
     });
   };

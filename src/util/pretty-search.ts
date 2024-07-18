@@ -31,7 +31,5 @@ export const prettySearch = (tableReturn: SearchRecipeRawReturn[]): Recipe[] | a
     };
     recipes.push(thisRecipe);
   }
-
-  console.log("what are the recipes we are returning", recipes);
   return recipes;
 };

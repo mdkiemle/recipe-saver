@@ -1,5 +1,5 @@
 import {ReactElement, useContext} from "react";
-import {AddIngredientGroup, BaseRecipe, RawIngredientGroup, RecipeTextUpdate, RecipeUpdateReturn, RecipeUpdates, RecipeUpdateVars} from "../../models/recipe"
+import {AddIngredientGroup, RawIngredientGroup, RecipeUpdateReturn, RecipeUpdates, RecipeUpdateVars} from "../../models/recipe"
 import {RecipeContext} from "../../context/RecipeContext";
 import {Button, Field, Label, Switch} from "@headlessui/react"
 import {RecipeSection} from "../../components/recipe-section";
@@ -7,20 +7,16 @@ import {getRequest} from "../../messaging/send";
 import { IngredientGroupSection } from "../../components/IngredientGroupSection";
 import { Card } from "../../components/Card";
 import { ToggleInput } from "../../components/ToggleInput";
-// import { PiTrash } from "react-icons/pi";
-// import { useNavigate } from "react-router";
+import { FolderSection } from "../../components/FolderSection";
 
 const RecipePage = (): ReactElement => {
-  const {recipe, dispatch, loading, isEditing, setIsEditing} = useContext(RecipeContext);
+  const {recipe, dispatch, loading, isEditing, setIsEditing, folders, setFolders} = useContext(RecipeContext);
   // const nav = useNavigate();
 
   const handleUpdateRecipe = (updates: Partial<RecipeUpdateVars>): void => {
-    let x = updates?.name;
-    console.log('x', x, updates.name, "boolean", Boolean(x), updates.name === "")
     if (updates?.name === "") return;
     getRequest<RecipeUpdateReturn, RecipeUpdates>("update-recipe", "update-recipe-return", {id: recipe.id, updates})
     .then(res => {
-      console.log("update recipe response", res);
       dispatch({type: "UPDATE_RECIPE", payload: res});
     })
   };
@@ -34,6 +30,7 @@ const RecipePage = (): ReactElement => {
 
   return (
     <div className="container flex flex-col gap-4">
+      <FolderSection />
       {!loading && recipe && <>
         {/* <PiTrash onClick={handleDelete} className="cursor-pointer"/> */}
         <Card className="container flex flex-row">

@@ -20,7 +20,6 @@ const IngredientItem = ({ingredient, isEditing}: IngredientItemProps): ReactElem
   const handleIngUpdate = (updates: Partial<IngredientUpdateVars>): void => {
     getRequest<AddIngredientReturn, IngredientUpdates>("update-ingredient", "update-ingredient-return", {id: ingredient.id, updates})
     .then(res => {
-      console.log("update ing response", res);
       dispatch({type: "UPDATE_INGREDIENT", payload: res})
     });
   };
@@ -28,7 +27,6 @@ const IngredientItem = ({ingredient, isEditing}: IngredientItemProps): ReactElem
   const handleDelete = (): void => {
     getRequest<DeleteIngredientReturn, number>("delete-ingredient", "delete-ingredient-return", ingredient.id)
     .then(res => {
-      console.log("here is response", res.id);
       dispatch({type: "DELETE_INGREDIENT", payload: res});
     });
   };

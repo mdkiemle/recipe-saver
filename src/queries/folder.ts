@@ -1,6 +1,7 @@
 import {ipcMain} from "electron";
 import {database} from "../index";
 import { RecipeReturn } from "../views/dashboard";
+import { IdName } from "../models/generic";
 
 ipcMain.on("get-all-folders", (event, arg) => {
 	const sql = `select * from folder`;
@@ -27,8 +28,39 @@ ipcMain.on("create-folder", (event, arg: string) => {
     values ("${arg}")
     returning *;
   `;
-  console.log("are we here?", createSql);
   database.get(createSql, (err, row) => {
     event.reply("create-folder-return", (err && err.message) || row);
+  });
+});
+
+ipcMain.on("add-to-folder", (event, {recipeId, folderId}) => {
+  const createSql = `
+    insert into folderRecipe (recipeId, folderId)
+    values (${recipeId}, ${folderId});
+  `;
+  database.exec(createSql, (err) => {
+    event.reply("add-to-folder-return", (err && err?.message) || true);
+  });
+});
+
+ipcMain.on("remove-from-folder", (event, {recipeId, folderId}) => {
+  const deleteSql = `
+    delete from folderRecipe
+    where recipeId = ${recipeId} and folderId = ${folderId}
+  `;
+  database.exec(deleteSql, (err) => {
+    event.reply("remove-from-folder-return", (err && err?.message) || true);
+  });
+});
+
+ipcMain.on("get-folders-for-recipe", (event, arg: number) => {
+  const createSql = `
+    select f.id as id, f.name as name from folderRecipe fr
+    left join folder f on f.id = fr.folderId
+    left join recipe r on r.id = fr.recipeId
+    where r.id = ${arg};
+  `;
+  database.all(createSql, (err: Error, rows: IdName) => {
+    event.reply("get-folders-for-recipe-return", (err && err.message) || rows);
   });
 });

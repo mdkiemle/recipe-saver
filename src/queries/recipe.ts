@@ -48,10 +48,8 @@ ipcMain.on("get-recipe", (event, arg: number) => {
 });
 
 ipcMain.on("update-recipe", (event, {id, updates}: RecipeUpdates) => {
-  console.log("what this", updates);
   const setQuery = setQueryBuilder(updates);
   const returning = returnValues(updates);
-  console.log("update recipe stuff", setQuery, returning);
   if (!(setQuery && returning)) return event.reply("update-recipe-return", "No update made");
   const sql = `
     update recipe
@@ -79,10 +77,16 @@ ipcMain.on("update-ingredient", (event, {id, updates}: IngredientUpdates) => {
   });
 });
 
-ipcMain.on("create-recipe", (event, arg: string) => {
-  const createSql = `insert into recipe (name) values ("${arg}") returning id, name;`
+ipcMain.on("create-recipe", (event, {name, folderId}: {name: string, folderId: number}) => {
+  const createSql = `insert into recipe (name) values ("${name}") returning id, name;`
   database.get(createSql, (err, row: {id: number, name: string}) => {
     if (err) return event.reply("create-error", err?.message);
+    if (folderId !== 0) {
+      database.exec(`
+        insert into folderRecipe (recipeId, folderId)
+        values (${row.id}, ${folderId});
+      `, err => console.log("err?", err));
+    }
     event.reply("create-recipe-return", (err && err.message) || row);
   });
 });
@@ -100,20 +104,17 @@ ipcMain.on("update-groupName", (event, {id, text}: RecipeTextUpdate) => {
 });
 
 ipcMain.on("add-ingGroup", (event, {recipeId, groupName}: AddIngredientGroup) => {
-  console.log("we are here?", groupName, recipeId);
   const updateSql = `
     insert into ingredientGroup (groupName, recipeId)
     values ("${groupName}", ${recipeId})
     returning groupName, id;
   `;
   database.get(updateSql, (err, row) => {
-    console.log("the new group?", row);
     event.reply("add-ingGroup-return", (err && err.message) || row);
   });
 });
 
 ipcMain.on("add-ingredient", (event, {ingredientGroupId, item, measurement}: AddIngredientVars) => {
-  console.log("we are adding ing", item, measurement);
   const addSql = `
     insert into ingredient (item, measurement, ingredientGroupId)
     values ("${item}", "${measurement}", ${ingredientGroupId})
@@ -142,20 +143,17 @@ ipcMain.on("delete-ingredient", (event, id: number) => {
     returning id, ingredientGroupId;
   `;
   database.get(deleteSql, (err, row) => {
-    console.log("huh", row);
     event.reply("delete-ingredient-return", (err && err.message) || row);
   });
 });
 
 ipcMain.on("delete-ingredientGroup", (event, id: number) => {
-  console.log("what's going on here", id);
   const deleteSql = `
     delete from ingredientGroup
     where id = ${id}
     returning id;
   `;
   database.get(deleteSql, (err, row) => {
-    console.log("deleted ingGroup id", row);
     event.reply("delete-ingredientGroup-return", (err && err.message) || row);
   });
 });

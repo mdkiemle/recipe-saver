@@ -7,7 +7,6 @@ import {DashboardPage} from "./views/dashboard";
 import {SearchPage} from "./views/search";
 import {RecipePage} from "./views/recipe";
 import {RecipeContextProvider} from "./context/RecipeContext";
-import {NavBar} from "./components/NavBar"
 import { DashboardContextProvider } from "./context/DashboardContext";
 import { FolderContextProvider } from "./context/FolderContext";
 
@@ -15,7 +14,6 @@ import { FolderContextProvider } from "./context/FolderContext";
 // We could potentially have DashboardContext wrap everything here, but for now it's fine. 
 const Main = (): ReactElement => (
   <div className="container relative">
-    <NavBar />
     <FolderContextProvider>
       <Routes>
         <Route path="/" element={<DashboardContextProvider><DashboardPage /> </DashboardContextProvider>}/>

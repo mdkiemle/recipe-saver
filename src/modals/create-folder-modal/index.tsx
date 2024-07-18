@@ -19,7 +19,6 @@ const CreateFolderModal = ({isOpen, onClose}: CreateFolderModalProps): ReactElem
   const handleCreate = (): void => {
     setIsLoading(true);
     getRequest<IdName, string>("create-folder", "create-folder-return", name).then(result => {
-      console.log("what is this result?", result);
       setIsLoading(false);
       dispatch({type: "ADD_FOLDER", payload: result})
       onClose();

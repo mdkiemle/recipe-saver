@@ -45,7 +45,6 @@ const FolderContextProvider = ({children}: FolderContextProps): ReactElement => 
       dispatch({type: "UPDATE_FOLDERS", payload: res});
     });
   });
-  console.log("HEY!", folders);
   return <FolderContext.Provider value={{folders, dispatch}}>
     {children}
   </FolderContext.Provider>

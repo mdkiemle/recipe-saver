@@ -1,5 +1,5 @@
 import {ReactElement, createContext, useReducer, useState} from "react";
-import {AddIngredientReturn, BaseRecipe, DeleteGroupReturn, DeleteIngredientReturn, RawIngredientGroup, Recipe, RecipeUpdateReturn} from "../models/recipe";
+import {AddIngredientReturn, BaseRecipe, DeleteGroupReturn, DeleteIngredientReturn, Folder, RawIngredientGroup, Recipe, RecipeUpdateReturn} from "../models/recipe";
 import { updateObject } from "../util/update-object";
 import { Setter } from "../models/setter" ;
 import { useLocation } from "react-router";
@@ -22,6 +22,8 @@ export interface BaseRecipeContext {
   isEditing: boolean;
   setIsEditing: Setter<boolean>;
   loading: boolean;
+  folders: Folder[];
+  setFolders: Setter<Folder[]>;
 }
 
 export interface RecipeContextProps {
@@ -41,6 +43,8 @@ const RecipeContext = createContext<BaseRecipeContext>({
   isEditing: false,
   setIsEditing: () => undefined,
   loading: false,
+  folders: [],
+  setFolders: () => undefined,
 });
 
 const recipeReducer = (state: Recipe, action: Action): Recipe => {
@@ -73,20 +77,15 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       const copyGroup = [...state.ingredientGroups];
       const idx = copyGroup.findIndex(group => group.id === ingredientGroupId);
       copyGroup[idx].ingredients.push(ing);
-      console.log("what did I just do", copyGroup);
       return updateObject(state, {
         ...state,
         ingredientGroups: copyGroup,
       });
     }
     case "UPDATE_INGREDIENT": {
-      console.log("what's happening here?", action.payload);
       const {ingredientGroupId, ...ingredient} = action.payload;
       const copyGroup = [...state.ingredientGroups];
-      console.log("and here?", copyGroup);
       const idx = copyGroup.findIndex(group => group.id === ingredientGroupId);
-      console.log("index?", idx);
-      console.log("and...?", copyGroup[idx])
       const idxIng = copyGroup[idx]?.ingredients.findIndex(ing => ing.id === ingredient.id);
       const updatedIngredient = updateObject(copyGroup[idx].ingredients[idxIng], {
         ...copyGroup[idx].ingredients[idxIng],
@@ -110,7 +109,6 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       });
     }
     case "DELETE_GROUP": {
-      console.log("here is the group id", action.payload);
       const copyGroup = [...state.ingredientGroups];
       const idx = copyGroup.findIndex(group => group.id === action.payload.id);
       copyGroup.splice(idx, 1);
@@ -129,6 +127,7 @@ const RecipeContextProvider = (props: RecipeContextProps): ReactElement => {
   const [recipe, dispatch] = useReducer(recipeReducer, baseRecipe);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [folders, setFolders] = useState<Folder[]>([]);
   useMount(() => {
     if (!id) return;
     setLoading(true);
@@ -140,9 +139,13 @@ const RecipeContextProvider = (props: RecipeContextProps): ReactElement => {
       console.error("Uh oh: ", err.message);
       setLoading(false);
     });
+    getRequest<Folder[], number>("get-folders-for-recipe", "get-folders-for-recipe-return", id)
+    .then(res => {
+      setFolders(res);
+    })
   });
   return (
-    <RecipeContext.Provider value={{recipe, dispatch, isEditing, setIsEditing, loading}}>
+    <RecipeContext.Provider value={{recipe, dispatch, isEditing, setIsEditing, loading, folders, setFolders}}>
       {props.children}
     </RecipeContext.Provider>
   );

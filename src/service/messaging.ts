@@ -7,7 +7,6 @@ const database = new sqlite.Database("./public/db.sqlite3", err => {
 
 ipcMain.on("async-message", (event, arg) => {
   const sql = arg;
-  console.log("hey it is inside here", arg, event);
   database.all(sql, (err, rows) => {
     event.reply("async-reply", (err && err.message) || rows);
   });

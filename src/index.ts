@@ -16,7 +16,7 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 // TODO: some initial setup for when a person first starts app. (create tables, etc.)
-export const database = new sqlite.Database("./public/db.sqlite3", err => {
+export const database = new sqlite.Database("./db.sqlite3", err => {
   if (err) console.error("Database opening error: ", err);
   setup(database);
 }).exec("PRAGMA foreign_keys=ON");

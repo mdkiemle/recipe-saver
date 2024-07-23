@@ -20,7 +20,7 @@ const config: ForgeConfig = {
       name: '@electron-forge/publisher-github',
       config: {
         repository: {
-          owner: 'me',
+          owner: 'mdkiemle',
           name: 'recipe-saver'
         },
         prerelease: true

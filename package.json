@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "description": "Recipe Saver",
   "main": ".webpack/main",
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/mdkiemle/recipe-saver"
+  },
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",

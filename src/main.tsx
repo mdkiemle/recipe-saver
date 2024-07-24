@@ -4,7 +4,6 @@
 import {ReactElement} from "react";
 import {NavLink, Route, Routes} from "react-router-dom";
 import {DashboardPage} from "./views/dashboard";
-import {SearchPage} from "./views/search";
 import {RecipePage} from "./views/recipe";
 import {RecipeContextProvider} from "./context/RecipeContext";
 import { DashboardContextProvider } from "./context/DashboardContext";
@@ -17,7 +16,6 @@ const Main = (): ReactElement => (
     <FolderContextProvider>
       <Routes>
         <Route path="/" element={<DashboardContextProvider><DashboardPage /> </DashboardContextProvider>}/>
-        <Route path="/search" element={<SearchPage />} />
         <Route path="/recipe" element={<RecipeContextProvider><RecipePage /> </RecipeContextProvider>} />
         <Route path="/recipe/:recipeId" element={<RecipePage />} />
       </Routes>

@@ -10,7 +10,7 @@ import { ToggleInput } from "../../components/ToggleInput";
 import { FolderSection } from "../../components/FolderSection";
 
 const RecipePage = (): ReactElement => {
-  const {recipe, dispatch, loading, isEditing, setIsEditing, folders, setFolders} = useContext(RecipeContext);
+  const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
   // const nav = useNavigate();
 
   const handleUpdateRecipe = (updates: Partial<RecipeUpdateVars>): void => {
@@ -25,8 +25,14 @@ const RecipePage = (): ReactElement => {
     getRequest<RawIngredientGroup, AddIngredientGroup>("add-ingGroup", "add-ingGroup-return", {groupName: "New Group", recipeId: recipe.id})
     .then(res => {
       dispatch({type: "ADD_ING_GROUP", payload: res});
+      setAutoFocus(true);
     });
   };
+
+  const handleSetEditing = (checked: boolean): void => {
+    setIsEditing(checked);
+    setAutoFocus(false);
+  }
 
   return (
     <div className="container flex flex-col gap-4">
@@ -48,7 +54,7 @@ const RecipePage = (): ReactElement => {
             <Label htmlFor="set-editting">Edit Recipe</Label>
             <Switch
               checked={isEditing}
-              onChange={setIsEditing}
+              onChange={handleSetEditing}
               className="group relative flex h-7 w-14 cursor-pointer rounded-full bg-purple-700 p-1 transition-colors duration-200 ease-in-out focus:outline-none data-[focus]:outline-1 data-[focus]:outline-white data-[checked]:bg-purple-700"
             >
               <span

@@ -13,7 +13,7 @@ export interface IngredientGroupProps {
 }
 
 const IngredientGroupSection = ({ingredientGroup: {id, ingredients, groupName}}: IngredientGroupProps): ReactElement => {
-  const {isEditing, dispatch} = useContext(RecipeContext);
+  const {isEditing, dispatch, setAutoFocus, autoFocus} = useContext(RecipeContext);
 
   const handleChangeGroup = (text: string): void => {
     getRequest<{id: number, groupName: string}, RecipeTextUpdate>("update-groupName", "update-groupName-return", {id, text})
@@ -28,6 +28,7 @@ const IngredientGroupSection = ({ingredientGroup: {id, ingredients, groupName}}:
     getRequest<AddIngredientReturn, AddIngredientVars>("add-ingredient", "add-ingredient-return", {item: "New item", measurement: "(Measurements)", ingredientGroupId: id})
     .then(res => {
       dispatch({type:"ADD_INGREDIENT", payload: res})
+      setAutoFocus(true);
     }).catch(err => {
       console.log("Uh oh! ", err);
     });
@@ -48,6 +49,7 @@ const IngredientGroupSection = ({ingredientGroup: {id, ingredients, groupName}}:
         isEditing={isEditing}
         className="text-xl col-span-5"
         onBlur={handleChangeGroup}
+        autoFocus={autoFocus}
       />
       <IngredientList ingredients={ingredients}/>
       { isEditing && <>

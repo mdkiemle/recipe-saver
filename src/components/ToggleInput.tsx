@@ -11,9 +11,10 @@ export interface ToggleInputProps {
   onBlur?: (newValue: string) => void;
   maxLength?: number;
   validate?: boolean;
+  autoFocus?: boolean;
 }
 
-const ToggleInput = ({id, isEditing, value, onBlur, className, editingStyle, maxLength, validate = false}: ToggleInputProps): ReactElement => {
+const ToggleInput = ({id, isEditing, value, onBlur, className, editingStyle, maxLength, validate = false, autoFocus = false}: ToggleInputProps): ReactElement => {
   const [text, setText] = useState(value ?? "");
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>): void => {
@@ -25,6 +26,9 @@ const ToggleInput = ({id, isEditing, value, onBlur, className, editingStyle, max
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => setText(e.target.value);
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>): void => {
+    e.target.select();
+  };
 
   useEffect(() => {
     if (value !== text) setText(value);
@@ -35,10 +39,12 @@ const ToggleInput = ({id, isEditing, value, onBlur, className, editingStyle, max
       id={id}
       value={text}
       onBlur={handleBlur}
+      onFocus={handleFocus}
       onChange={handleChange}
-      className={clsx("rounded-md px-4 py-2", className, editingStyle || "bg-gray-100 outline-none cursor-auto")}
+      className={clsx("rounded-md px-4 py-2", className, editingStyle || "bg-gray-100 cursor-auto")}
       readOnly={!isEditing}
       maxLength={maxLength}
+      autoFocus={autoFocus}
       /> : <span className={clsx(className)}>{text}</span>
     }
     </>

@@ -24,6 +24,8 @@ export interface BaseRecipeContext {
   loading: boolean;
   folders: Folder[];
   setFolders: Setter<Folder[]>;
+  autoFocus: boolean;
+  setAutoFocus: Setter<boolean>;
 }
 
 export interface RecipeContextProps {
@@ -39,12 +41,14 @@ export type Action =
 
 const RecipeContext = createContext<BaseRecipeContext>({
   recipe: baseRecipe,
-  dispatch: () => undefined,
-  isEditing: false,
-  setIsEditing: () => undefined,
-  loading: false,
   folders: [],
+  autoFocus: false,
+  isEditing: false,
+  loading: false,
   setFolders: () => undefined,
+  setAutoFocus: () => undefined,
+  setIsEditing: () => undefined,
+  dispatch: () => undefined,
 });
 
 const recipeReducer = (state: Recipe, action: Action): Recipe => {
@@ -128,6 +132,7 @@ const RecipeContextProvider = (props: RecipeContextProps): ReactElement => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [folders, setFolders] = useState<Folder[]>([]);
+  const [autoFocus, setAutoFocus] = useState(false);
   useMount(() => {
     if (!id) return;
     setLoading(true);
@@ -145,7 +150,7 @@ const RecipeContextProvider = (props: RecipeContextProps): ReactElement => {
     })
   });
   return (
-    <RecipeContext.Provider value={{recipe, dispatch, isEditing, setIsEditing, loading, folders, setFolders}}>
+    <RecipeContext.Provider value={{recipe, dispatch, isEditing, setIsEditing, loading, folders, setFolders, autoFocus, setAutoFocus}}>
       {props.children}
     </RecipeContext.Provider>
   );

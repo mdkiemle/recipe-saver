@@ -16,7 +16,7 @@ interface Updates {
 }
 
 const IngredientItem = ({ingredient, isEditing}: IngredientItemProps): ReactElement => {
-  const {dispatch} = useContext(RecipeContext);
+  const {dispatch, autoFocus} = useContext(RecipeContext);
   const handleIngUpdate = (updates: Partial<IngredientUpdateVars>): void => {
     getRequest<AddIngredientReturn, IngredientUpdates>("update-ingredient", "update-ingredient-return", {id: ingredient.id, updates})
     .then(res => {
@@ -39,6 +39,7 @@ const IngredientItem = ({ingredient, isEditing}: IngredientItemProps): ReactElem
         className="px-1 py-1 col-span-2"
         onBlur={val => handleIngUpdate({measurement: val})}
         editingStyle="bg-gray-100"
+        autoFocus={autoFocus}
       />
       <ToggleInput
         id={`${ingredient.id}-item`}

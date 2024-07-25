@@ -1,10 +1,10 @@
 import {Button} from "@headlessui/react";
 import { ReactElement, useContext, useState } from "react";
-import {TextInput} from "../../components/text-input";
-import {getRequest } from "../../messaging/send";
-import { IdName } from "../../models/generic";
-import { FolderContext } from "../../context/FolderContext";
-import { Modal } from "../Modal";
+import {TextInput} from "../components/text-input";
+import {getRequest } from "../messaging/send";
+import { IdName } from "../models/generic";
+import { FolderContext } from "../context/FolderContext";
+import { Modal } from "./";
 
 export interface CreateFolderModalProps {
   isOpen: boolean;

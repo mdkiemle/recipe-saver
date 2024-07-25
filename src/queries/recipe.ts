@@ -128,11 +128,11 @@ ipcMain.on("add-ingredient", (event, {ingredientGroupId, item, measurement}: Add
 ipcMain.on("delete-recipe", (event, id: number) => {
   const deleteSql = `
     delete from recipe
-    where id =${id}
+    where id = ${id}
     returning id;
   `;
   database.get(deleteSql, (err, row) => {
-    event.reply("delete-recipe-return");
+    event.reply("delete-recipe-return", (err && err.message) || row);
   });
 });
 

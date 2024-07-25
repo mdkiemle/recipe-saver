@@ -12,7 +12,7 @@ import { FolderContextProvider } from "./context/FolderContext";
 
 // We could potentially have DashboardContext wrap everything here, but for now it's fine. 
 const Main = (): ReactElement => (
-  <div className="container relative">
+  <div className="container relative m-auto">
     <FolderContextProvider>
       <Routes>
         <Route path="/" element={<DashboardContextProvider><DashboardPage /> </DashboardContextProvider>}/>

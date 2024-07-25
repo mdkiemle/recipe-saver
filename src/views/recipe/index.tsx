@@ -1,4 +1,4 @@
-import {ReactElement, useContext} from "react";
+import {ReactElement, useContext, useState} from "react";
 import {AddIngredientGroup, RawIngredientGroup, RecipeUpdateReturn, RecipeUpdates, RecipeUpdateVars} from "../../models/recipe"
 import {RecipeContext} from "../../context/RecipeContext";
 import {Button, Field, Label, Switch} from "@headlessui/react"
@@ -8,10 +8,15 @@ import { IngredientGroupSection } from "../../components/IngredientGroupSection"
 import { Card } from "../../components/Card";
 import { ToggleInput } from "../../components/ToggleInput";
 import { FolderSection } from "../../components/FolderSection";
+import { ConfirmModal } from "../../modals/";
+import { useNavigate } from "react-router";
 
 const RecipePage = (): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
-  // const nav = useNavigate();
+  const [showDelete, setShowDelete] = useState(false);
+  const nav = useNavigate();
+
+  const toggleDelete = (): void => setShowDelete(prev => !prev);
 
   const handleUpdateRecipe = (updates: Partial<RecipeUpdateVars>): void => {
     if (updates?.name === "") return;
@@ -34,8 +39,17 @@ const RecipePage = (): ReactElement => {
     setAutoFocus(false);
   }
 
+  const handleDelete = (): void => {
+    getRequest<number, number>("delete-recipe", "delete-recipe-return", recipe.id)
+    .then(res => {
+      if (res) nav(-1);
+    }).catch(err => {
+      console.log("Uh oh: ", err);
+    });
+  }
+
   return (
-    <div className="container flex flex-col gap-4">
+    <div className="container flex flex-col gap-4 m-auto">
       <FolderSection />
       {!loading && recipe && <>
         {/* <PiTrash onClick={handleDelete} className="cursor-pointer"/> */}
@@ -79,8 +93,12 @@ const RecipePage = (): ReactElement => {
           <h2 className="text-xl">Notes</h2>
           <RecipeSection id="notes" textValue={recipe.notes ?? ""} onBlur={val => handleUpdateRecipe({notes: val})} />
         </Card>
+        {isEditing && <Button className="btn-delete self-end" onClick={toggleDelete}>Delete</Button>}
         </>
       }
+      <ConfirmModal isOpen={showDelete} onClose={toggleDelete} title="Delete Recipe" handleConfirm={handleDelete}>
+        <div>Are you sure you want to delete this recipe? This cannot be undone</div>
+      </ConfirmModal>
     </div>
   );
 };

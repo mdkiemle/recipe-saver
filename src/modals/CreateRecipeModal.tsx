@@ -1,11 +1,11 @@
 import {Button} from "@headlessui/react";
 import { ReactElement, useEffect, useState } from "react";
-import {TextInput} from "../../components/text-input";
-import {getRequest } from "../../messaging/send";
+import {TextInput} from "../components/text-input";
+import {getRequest } from "../messaging/send";
 import { useNavigate } from "react-router";
-import { IdName } from "../../models/generic";
-import { FolderSelect } from "../../components/FolderSelect";
-import { Modal } from "../Modal";
+import { IdName } from "../models/generic";
+import { FolderSelect } from "../components/FolderSelect";
+import { Modal } from ".";
 
 export interface CreateRecipeModalProps {
   isOpen: boolean;

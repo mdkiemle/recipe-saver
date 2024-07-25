@@ -1,6 +1,6 @@
 import {ReactElement, useContext, useEffect, useState} from "react";
 import {SearchRecipe} from "../../../src/models/recipe";
-import { CreateRecipeModal } from "../../modals/create-recipe-modal";
+import { CreateRecipeModal } from "../../modals/";
 import { Button } from "@headlessui/react";
 import { getRequest } from "../../messaging/send";
 import { RecipeCard } from "../../components/RecipeCard";
@@ -10,7 +10,7 @@ import { FolderItem } from "../../components/FolderItem";
 import { FolderNav } from "../../components/FolderNav";
 import { FolderContext } from "../../context/FolderContext";
 import { NoFolderSection } from "../../components/NoFolderSection";
-import { CreateFolderModal } from "../../modals/create-folder-modal";
+import { CreateFolderModal } from "../../modals";
 import { PiChefHat, PiFolderFill } from "react-icons/pi";
 
 export interface RecipeReturn {

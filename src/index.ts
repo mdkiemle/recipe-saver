@@ -25,13 +25,6 @@ export const database = new sqlite.Database("./db.sqlite3", err => {
   setup(database);
 }).exec("PRAGMA foreign_keys=ON");
 
-ipcMain.on("async-message", (event, arg) => {
-  const sql = arg;
-  database.all(sql, (err: Error, rows: string) => {
-    event.reply("async-reply", (err && err.message) || rows);
-  });
-});
-
 const createWindow = (): void => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({

@@ -49,8 +49,6 @@ const DashboardPage = (): ReactElement => {
     });
   };
 
-  console.log("what is the search", activeSearch);
-
   useEffect(() => {
     if (folder.id === 0) return;
     getByFolder();

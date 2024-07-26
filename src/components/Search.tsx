@@ -17,12 +17,6 @@ const Search = ({handleSearch, handleReset, resultCount}: SearchProps): ReactEle
     handleReset();
   };
 
-  console.log("I am inside the search", activeSearch);
-
-  // useEffect(() => {
-  //   resetSearch();
-  // }, [folder.id]);
-
   return (
     <div className="flex-1">
       <SearchInput onEnter={handleSearch} search={search} setSearch={setSearch}/>

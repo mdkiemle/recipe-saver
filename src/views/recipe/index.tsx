@@ -9,15 +9,12 @@ import { Card } from "../../components/Card";
 import { ToggleInput } from "../../components/ToggleInput";
 import { FolderSection } from "../../components/FolderSection";
 import { ConfirmModal } from "../../modals/";
-import { useLocation, useNavigate} from "react-router";
+import {useNavigate} from "react-router";
 
 const RecipePage = (): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
   const [showDelete, setShowDelete] = useState(false);
   const nav = useNavigate();
-  const location = useLocation();
-
-  console.log("Location in recipe", location);
 
   const toggleDelete = (): void => setShowDelete(prev => !prev);
 

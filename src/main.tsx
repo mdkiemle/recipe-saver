@@ -2,7 +2,7 @@
  * The main entry point for the react app. Routes and such should probably go here
  */
 import {ReactElement} from "react";
-import {NavLink, Route, Routes} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import {DashboardPage} from "./views/dashboard";
 import {RecipePage} from "./views/recipe";
 import {RecipeContextProvider} from "./context/RecipeContext";
@@ -14,11 +14,12 @@ import { FolderContextProvider } from "./context/FolderContext";
 const Main = (): ReactElement => (
   <div className="container relative m-auto">
     <FolderContextProvider>
-      <Routes>
-        <Route path="/" element={<DashboardContextProvider><DashboardPage /> </DashboardContextProvider>}/>
-        <Route path="/recipe" element={<RecipeContextProvider><RecipePage /> </RecipeContextProvider>} />
-        <Route path="/recipe/:recipeId" element={<RecipePage />} />
-      </Routes>
+      <DashboardContextProvider>
+        <Routes>
+          <Route path="/:recipeId?" element={<DashboardPage />}/>
+          <Route path="/recipe" element={<RecipeContextProvider><RecipePage /> </RecipeContextProvider>} />
+        </Routes>
+      </DashboardContextProvider>
     </FolderContextProvider>
   </div>
 );

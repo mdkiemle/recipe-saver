@@ -1,6 +1,7 @@
 import React, {ReactElement, useContext, useEffect, useState} from "react";
 import { SearchInput } from "./SearchInput";
 import { DashboardContext } from "../context/DashboardContext";
+import { useSearchParams } from "react-router-dom";
 
 export interface SearchProps {
   handleSearch: (value: string) => void;
@@ -16,9 +17,11 @@ const Search = ({handleSearch, handleReset, resultCount}: SearchProps): ReactEle
     handleReset();
   };
 
-  useEffect(() => {
-    resetSearch();
-  }, [folder.id]);
+  console.log("I am inside the search", activeSearch);
+
+  // useEffect(() => {
+  //   resetSearch();
+  // }, [folder.id]);
 
   return (
     <div className="flex-1">

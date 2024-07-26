@@ -27,8 +27,8 @@ const DashboardPage = (): ReactElement => {
   const [showCreateRecipe, setShowCreateRecipe] = useState(false);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [searching, setSearching] = useState(false);
-  const {setActiveSearch, activeSearch, folder, setFolder} = useContext(DashboardContext);
-  const {folders} = useContext(FolderContext)
+  const {activeSearch, folder, setFolder, setActiveSearch} = useContext(DashboardContext);
+  const {folders} = useContext(FolderContext);
 
   const toggleShowCreateRecipe = (): void => setShowCreateRecipe(prev => !prev);
   const toggleShowCreateFolder = (): void => setShowCreateFolder(prev => !prev);
@@ -40,15 +40,16 @@ const DashboardPage = (): ReactElement => {
     });
   };
 
-  const handleSearch = (item: string): void => {
+  const handleSearch = (): void => {
     setSearching(true);
-    setActiveSearch(item);
-    getRequest<SearchRecipe[], [string, number?]>("search", "search-return", [item, folder?.id])
+    getRequest<SearchRecipe[], [string, number?]>("search", "search-return", [activeSearch, folder?.id])
     .then(res => {
       setRecipe(res);
       setSearching(false);
     });
   };
+
+  console.log("what is the search", activeSearch);
 
   useEffect(() => {
     if (folder.id === 0) return;
@@ -61,10 +62,14 @@ const DashboardPage = (): ReactElement => {
     getByFolder();
   };
 
+  useEffect(() => {
+    if (activeSearch) handleSearch();
+  }, [activeSearch]);
+
   return (
     <div className="container md:mx-auto">
       <header className="flex gap-2">
-        <Search handleSearch={handleSearch} handleReset={handleReset} resultCount={recipe.length}/>
+        <Search handleSearch={setActiveSearch} handleReset={handleReset} resultCount={recipe.length}/>
         <Button className="btn-primary self-start" onClick={toggleShowCreateRecipe}>
           <PiChefHat /> Create Recipe
         </Button>
@@ -75,7 +80,7 @@ const DashboardPage = (): ReactElement => {
       <FolderNav />
       <div className="grid grid-cols-3 gap-2 grid-flow-row-dense">
         {!folder.id && !activeSearch && folders?.map(f => <FolderItem key={f.id} folder={f} onClick={setFolder}/>)}
-        {recipe?.map(r => (
+        {(folder.id || activeSearch) && recipe?.map(r => (
           <RecipeCard key={r.id} recipe={r}/>
         ))}
       </div>

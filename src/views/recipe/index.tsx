@@ -9,12 +9,15 @@ import { Card } from "../../components/Card";
 import { ToggleInput } from "../../components/ToggleInput";
 import { FolderSection } from "../../components/FolderSection";
 import { ConfirmModal } from "../../modals/";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate} from "react-router";
 
 const RecipePage = (): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
   const [showDelete, setShowDelete] = useState(false);
   const nav = useNavigate();
+  const location = useLocation();
+
+  console.log("Location in recipe", location);
 
   const toggleDelete = (): void => setShowDelete(prev => !prev);
 
@@ -52,9 +55,7 @@ const RecipePage = (): ReactElement => {
     <div className="container flex flex-col gap-4 m-auto">
       <FolderSection />
       {!loading && recipe && <>
-        {/* <PiTrash onClick={handleDelete} className="cursor-pointer"/> */}
         <Card className="container flex flex-row">
-          {/* <h1 className="text-2xl">{recipe.name}</h1> */}
           <ToggleInput
             value={recipe.name}
             id="recipe-name"

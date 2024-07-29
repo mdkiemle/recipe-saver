@@ -63,7 +63,7 @@ export const setup = (db: sqlite.Database): void => {
 			)
 		`);
     db.run(`
-      CREATE TABLE timers (
+      CREATE TABLE timer (
         id INTEGER NOT NULL,
         name TEXT NOT NULL,
         minTime	INTEGER,

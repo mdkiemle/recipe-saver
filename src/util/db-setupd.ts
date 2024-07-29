@@ -22,12 +22,25 @@ export const setup = (db: sqlite.Database): void => {
 				folderId INTEGER NOT NULL,
 				recipeId INTEGER NOT NULL,
 				FOREIGN KEY (folderId)
-					REFERENCES folder (id),
+					REFERENCES folder (id) ON DELETE CASCADE,
 				FOREIGN KEY (recipeId)
-					REFERENCES recipe (id)
+					REFERENCES recipe (id) ON DELETE CASCADE,
 				CONSTRAINT PK_folder PRIMARY KEY (recipeId, folderId)
 			)
 		`);
+    db.run(`
+      CREATE TABLE recipeToRecipe (
+        id	INTEGER NOT NULL,
+        recipeParentId	INTEGER,
+        recipeChildId	INTEGER,
+        PRIMARY KEY(id AUTOINCREMENT),
+        FOREIGN KEY(recipeChildId)
+          REFERENCES recipe(id) ON DELETE CASCADE,
+        FOREIGN KEY(recipeParentId)
+          REFERENCES recipe(id) ON DELETE CASCADE,
+        CONSTRAINT PK_RtoR PRIMARY KEY(recipeParentId,recipeChildId)
+      );  
+    `);
 		db.run(`
 			CREATE TABLE IF NOT EXISTS ingredientGroup (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,5 +62,17 @@ export const setup = (db: sqlite.Database): void => {
 					ON DELETE CASCADE
 			)
 		`);
+    db.run(`
+      CREATE TABLE timers (
+        id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        minTime	INTEGER,
+        maxTime	INTEGER,
+        recipeId INTEGER,
+        FOREIGN KEY(recipeId)
+          REFERENCES recipe(id) ON DELETE CASCADE,
+        PRIMARY KEY(id AUTOINCREMENT)
+      );
+    `)
 	});
 }

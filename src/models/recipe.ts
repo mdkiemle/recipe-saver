@@ -6,6 +6,15 @@ export interface Ingredient {
   measurement: string;
 }
 
+export interface Timer {
+  id: number;
+  name: string;
+  // recipeId: number;
+  minTime?: number;
+  maxTime?: number;
+  measurement?: "seconds" | "minutes" | "hours"
+}
+
 export interface RawIngredientGroup {
   id: number;
   groupName: string;
@@ -33,6 +42,7 @@ export interface BaseRecipe {
 
 export interface Recipe extends BaseRecipe {
   ingredientGroups: IngredientGroup[];
+  timers: Timer[];
 }
 
 export interface SearchRecipe extends BaseRecipe {

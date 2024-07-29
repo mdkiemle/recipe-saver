@@ -1,5 +1,5 @@
 import {groupBy} from "lodash";
-import { Ingredient, Recipe } from "../models/recipe";
+import { Ingredient, Recipe, SearchRecipe } from "../models/recipe";
 
 export interface SearchRecipeRawReturn {
   id: number;
@@ -10,11 +10,11 @@ export interface SearchRecipeRawReturn {
   description?: string;
 }
 
-export const prettySearch = (tableReturn: SearchRecipeRawReturn[]): Recipe[] | any => {
+export const prettySearch = (tableReturn: SearchRecipeRawReturn[]): SearchRecipe[] | any => {
   const uniqueGroups = groupBy(tableReturn, "id");
   const keys = Object.keys(uniqueGroups);
 
-  const recipes: Recipe[] = [];
+  const recipes: SearchRecipe[] = [];
 
   for (const key of keys) {
     const ingredients = uniqueGroups[key].map(g => ({

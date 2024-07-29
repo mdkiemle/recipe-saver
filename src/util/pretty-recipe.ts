@@ -1,7 +1,7 @@
 // Better typing coming soon
 
 import {groupBy} from "lodash";
-import {Ingredient, IngredientGroup, Recipe} from "../models/recipe";
+import {Ingredient, IngredientGroup, Recipe, Timer} from "../models/recipe";
 
 
 // Types file?
@@ -16,11 +16,18 @@ export interface RawReturn {
   ingredientId?: number;
   measurement?: string;
   item?: string;
+  timerName?: string;
+  timerId?: number;
+  minTime?: number;
+  maxTime?: number;
+  timeMeasurement?: "seconds" | "minutes" | "hours";
 }
 
 export const prettyRecipe = (tableReturn: RawReturn[]): Recipe => {
   const uniqueGroups = groupBy(tableReturn, "groupId");
+  const uniqueTimers = groupBy(tableReturn, "timerId");
   const keys = Object.keys(uniqueGroups);
+  const timerKeys = Object.keys(uniqueTimers);
   const ingGroups: IngredientGroup[] = [];
   for (const key of keys) {
     const ingT: Ingredient[] = uniqueGroups[key].flatMap(g => {
@@ -39,6 +46,16 @@ export const prettyRecipe = (tableReturn: RawReturn[]): Recipe => {
     const exists = Boolean(groups.groupName);
     if (exists) ingGroups.push(groups);
   }
+  const timers: Timer[] = [];
+  for (const key of timerKeys) {
+    timers.push({
+      id: uniqueTimers[key][0].timerId,
+      name: uniqueTimers[key][0].timerName,
+      minTime: uniqueTimers[key][0].minTime,
+      maxTime: uniqueTimers[key][0].maxTime,
+      measurement: uniqueTimers[key][0].timeMeasurement,
+    });
+  }
 
   const recipe: Recipe = {
     id: tableReturn[0]?.id,
@@ -47,6 +64,7 @@ export const prettyRecipe = (tableReturn: RawReturn[]): Recipe => {
     description: tableReturn[0]?.description,
     notes: tableReturn[0]?.notes,
     ingredientGroups: ingGroups,
+    timers: timers,
   };
   return recipe;
 };

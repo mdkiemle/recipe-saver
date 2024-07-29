@@ -29,7 +29,7 @@ export const setup = (db: sqlite.Database): void => {
 			)
 		`);
     db.run(`
-      CREATE TABLE recipeToRecipe (
+      CREATE TABLE IF NOT EXISTS recipeToRecipe (
         id	INTEGER NOT NULL,
         recipeParentId	INTEGER,
         recipeChildId	INTEGER,
@@ -63,7 +63,7 @@ export const setup = (db: sqlite.Database): void => {
 			)
 		`);
     db.run(`
-      CREATE TABLE timer (
+      CREATE TABLE IF NOT EXISTS timer (
         id INTEGER NOT NULL,
         name TEXT NOT NULL,
         minTime	INTEGER,

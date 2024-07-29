@@ -12,6 +12,7 @@ const baseRecipe: Recipe = {
   name: "Filler name",
   instructions: "",
   ingredientGroups: [],
+  timers: [],
   description: "",
   notes: "",
 };

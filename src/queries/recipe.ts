@@ -9,10 +9,12 @@ import { RecipeReturn } from "../views/dashboard";
 
 // Might not be necessary? But just in case I want to use this elsewhere.
 export const recipeQuery = (id: number): string => `
-  select r.id, description, notes, name, instructions,
-  ig.id as groupId, groupName, i.id as ingredientId, measurement, item from recipe r
+  select r.id, description, notes, r.name as name, instructions, t.name as timerName,
+  ig.id as groupId, groupName, i.id as ingredientId, i.measurement as measurement,
+  item, t.measurement as timeMeasurement, minTime, maxTime, t.id as timerId from recipe r
   left join ingredientGroup ig on r.id=ig.recipeId
   left join ingredient i on i.ingredientGroupId=ig.id
+  left join timer t on t.recipeId = r.id
   where r.id = ${id}
   order by ig.id, i.id;
 `;
@@ -42,8 +44,9 @@ ipcMain.on("get-recipes-no-folder", (event) => {
 ipcMain.on("get-recipe", (event, arg: number) => {
   const sql = recipeQuery(arg);
   database.all(sql, (err: Error, rows: RawReturn[]) => {
+    if (err) return event.reply("recipe-retrieved", err.message);
     const recipe = prettyRecipe(rows);
-    event.reply("recipe-retrieved", (err && err.message) || recipe);
+    event.reply("recipe-retrieved", recipe);
   });
 });
 

@@ -68,6 +68,7 @@ export const setup = (db: sqlite.Database): void => {
         name TEXT NOT NULL,
         minTime	INTEGER,
         maxTime	INTEGER,
+        measurement TEXT,
         recipeId INTEGER,
         FOREIGN KEY(recipeId)
           REFERENCES recipe(id) ON DELETE CASCADE,

@@ -10,7 +10,6 @@ export interface IngredientListProps {
 
 const IngredientList = ({ingredients}: IngredientListProps): ReactElement => {
   const {isEditing} = useContext(RecipeContext);
-  console.log("what is happening", ingredients);
   return (
     <ul className="list-image-none flex flex-col gap-2 my-4">
       {ingredients.map(ing => <IngredientItem key={ing.id} ingredient={ing} isEditing={isEditing}/>)}

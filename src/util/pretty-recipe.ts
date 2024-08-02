@@ -24,7 +24,6 @@ export const prettyRecipe = (tableReturn: RawReturn[], timers: Timer[]): Recipe 
   const keys = Object.keys(uniqueGroups);
   // const timerKeys = Object.keys(uniqueTimers);
   const ingGroups: IngredientGroup[] = [];
-  console.log("keys of groups", keys, "uniqueGroups", uniqueGroups);
   for (const key of keys) {
     const ingT: Ingredient[] = uniqueGroups[key].flatMap(g => {
       if (g.ingredientId) return {
@@ -42,21 +41,6 @@ export const prettyRecipe = (tableReturn: RawReturn[], timers: Timer[]): Recipe 
     const exists = Boolean(groups.groupName);
     if (exists) ingGroups.push(groups);
   }
-  // console.log("keys of timers", timerKeys, "uniqueTimers", uniqueTimers);
-  // const timers: Timer[] = [];
-  // for (const key of timerKeys) {
-  //   if (uniqueTimers[key][0].timerId) {
-  //     timers.push({
-  //       id: uniqueTimers[key][0].timerId,
-  //       name: uniqueTimers[key][0].timerName,
-  //       minTime: uniqueTimers[key][0].minTime,
-  //       maxTime: uniqueTimers[key][0].maxTime,
-  //       measurement: uniqueTimers[key][0].timeMeasurement,
-  //     });
-  //   }
-  // }
-
-  // console.log("what is going on here", ingGroups, timers);
 
   const recipe: Recipe = {
     id: tableReturn[0]?.id,

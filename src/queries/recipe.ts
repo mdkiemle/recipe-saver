@@ -2,9 +2,10 @@ import {ipcMain} from "electron";
 import {database} from "../index";
 import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
-import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer} from "../models/recipe";
+import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars} from "../models/recipe";
 import { returnValues } from "../util/sql-returning";
 import { RecipeReturn } from "../views/dashboard";
+import { addQueryBuilder } from "../util/add-query-builder";
 
 
 // Might not be necessary? But just in case I want to use this elsewhere.
@@ -72,6 +73,19 @@ ipcMain.on("update-recipe", (event, {id, updates}: RecipeUpdates) => {
   });
 });
 
+ipcMain.on("add-timer", (event, newTimer: AddTimerVars) => {
+  const [values, keys] = addQueryBuilder(newTimer);
+  console.log("addQuery", values, keys);
+  const sql = `
+    insert into timer (${keys})
+    values (${values})
+    returning id, name, minTime, maxTime, measurement;
+  `;
+  database.get(sql, (err, row) => {
+    event.reply("add-timer-return", (err && err.message) || row);
+  });
+});
+
 ipcMain.on("update-timer", (event, {id, updates}: TimerUpdates) => {
   const setQuery = setQueryBuilder(updates);
   const returning = returnValues(updates);
@@ -85,6 +99,16 @@ ipcMain.on("update-timer", (event, {id, updates}: TimerUpdates) => {
 
   database.get(sql, (err, row) => {
     event.reply("update-timer-return", (err && err.message) || row);
+  });
+});
+
+ipcMain.on("delete-timer", (event, id: number) => {
+  const sql = `
+    delete from timer where id = ${id}
+    returning id;
+  `;
+  database.get(sql, (err, row: number) => {
+    event.reply("delete-timer-return", (err && err.message) || row);
   });
 });
 

@@ -12,7 +12,7 @@ export interface TimerProps {
 }
 
 const TimerItem = ({timer}: TimerProps): ReactElement => {
-  const {isEditing, dispatch} = useContext(RecipeContext);
+  const {isEditing, dispatch, autoFocus} = useContext(RecipeContext);
   const handleTimerUpdate = (updates:  Pick<TimerUpdateVars, "measurement" | "name">): void => {
     getRequest<AddTimerReturn, TimerUpdates>("update-timer", "update-timer-return", {id: timer.id, updates})
     .then(res => {
@@ -35,6 +35,7 @@ const TimerItem = ({timer}: TimerProps): ReactElement => {
         className="px-1 py-1"
         isEditing={isEditing}
         onBlur={v => handleTimerUpdate({name: v})}
+        autoFocus={autoFocus}
       />
       <div className="flex gap-2 items-center">
         {timer.minTime !== null && <>

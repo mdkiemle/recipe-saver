@@ -117,6 +117,13 @@ export interface AddIngredientReturn extends Ingredient {
   ingredientGroupId: number;
 }
 
+export interface AddTimerVars {
+  name: string
+  recipeId: number;
+  minTime?: number;
+  maxTime?: number;
+}
+
 export interface AddTimerReturn {
   id: number;
   name: string;

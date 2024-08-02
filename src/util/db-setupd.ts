@@ -30,10 +30,8 @@ export const setup = (db: sqlite.Database): void => {
 		`);
     db.run(`
       CREATE TABLE IF NOT EXISTS recipeToRecipe (
-        id	INTEGER NOT NULL,
         recipeParentId	INTEGER,
         recipeChildId	INTEGER,
-        PRIMARY KEY(id AUTOINCREMENT),
         FOREIGN KEY(recipeChildId)
           REFERENCES recipe(id) ON DELETE CASCADE,
         FOREIGN KEY(recipeParentId)

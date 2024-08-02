@@ -10,11 +10,6 @@ export interface IngredientItemProps {
   isEditing: boolean;
 }
 
-interface Updates {
-  measurement?: string;
-  item?: string;
-}
-
 const IngredientItem = ({ingredient, isEditing}: IngredientItemProps): ReactElement => {
   const {dispatch, autoFocus} = useContext(RecipeContext);
   const handleIngUpdate = (updates: Partial<IngredientUpdateVars>): void => {

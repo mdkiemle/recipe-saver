@@ -1,5 +1,5 @@
 import {ReactElement, createContext, useReducer, useState} from "react";
-import {AddIngredientReturn, BaseRecipe, DeleteGroupReturn, DeleteIngredientReturn, Folder, RawIngredientGroup, Recipe, RecipeUpdateReturn} from "../models/recipe";
+import {AddIngredientReturn, AddTimerReturn, BaseRecipe, DeleteGroupReturn, DeleteIngredientReturn, Folder, RawIngredientGroup, Recipe, RecipeUpdateReturn, Timer} from "../models/recipe";
 import { updateObject } from "../util/update-object";
 import { Setter } from "../models/setter" ;
 import { useLocation } from "react-router";
@@ -38,7 +38,8 @@ export type Action =
   {type: "UPDATE_GROUPNAME" | "ADD_ING_GROUP", payload: RawIngredientGroup} |
   {type: "ADD_INGREDIENT" | "UPDATE_INGREDIENT", payload: AddIngredientReturn} |
   {type: "DELETE_INGREDIENT", payload: DeleteIngredientReturn} |
-  {type: "DELETE_GROUP", payload: DeleteGroupReturn};
+  {type: "DELETE_GROUP", payload: DeleteGroupReturn} |
+  {type: "ADD_TIMER" | "UPDATE_TIMER", payload: Timer};
 
 const RecipeContext = createContext<BaseRecipeContext>({
   recipe: baseRecipe,
@@ -77,6 +78,25 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
         ...state,
         ingredientGroups: [...state.ingredientGroups, {...action.payload, ingredients: []}]
       });
+    case "ADD_TIMER": {
+      return updateObject(state, {
+        ...state,
+        timers: [...state.timers, action.payload],
+      });
+    }
+    case "UPDATE_TIMER": {
+      const copiedTimers = [...state.timers];
+      const idx = copiedTimers.findIndex(timer => timer.id === action.payload?.id);
+      const updatedTimer = updateObject(copiedTimers[idx], {
+        id: copiedTimers[idx].id,
+        ...action.payload,
+      });
+      copiedTimers.splice(idx, 1, updatedTimer);
+      return updateObject(state, {
+        ...state,
+        timers: copiedTimers,
+      })
+    }
     case "ADD_INGREDIENT": {
       const {ingredientGroupId, ...ing} = action.payload;
       const copyGroup = [...state.ingredientGroups];

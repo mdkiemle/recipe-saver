@@ -6,13 +6,15 @@ export interface Ingredient {
   measurement: string;
 }
 
+export type TimerMeasure = "seconds" | "minutes" | "hours";
+
 export interface Timer {
   id: number;
   name: string;
   // recipeId: number;
   minTime?: number;
   maxTime?: number;
-  measurement?: "seconds" | "minutes" | "hours"
+  measurement?: TimerMeasure;
 }
 
 export interface RawIngredientGroup {
@@ -75,12 +77,17 @@ export interface RecipeUpdateVars {
 
 export interface RecipeUpdates {
   id: number;
-  updates: Partial<KeysOfObj<RecipeUpdateVars>>;
+  updates: Partial<RecipeUpdateVars>;
 };
 
 export interface IngredientUpdates {
   id: number;
-  updates: Partial<KeysOfObj<IngredientUpdateVars>>;
+  updates: Partial<IngredientUpdateVars>;
+}
+
+export interface TimerUpdates {
+  id: number;
+  updates: Partial<TimerUpdateVars>;
 }
 
 export type RecipeUpdateReturn = {id: number} & Partial<RecipeUpdateVars>
@@ -108,6 +115,21 @@ export interface AddIngredientVars {
 
 export interface AddIngredientReturn extends Ingredient {
   ingredientGroupId: number;
+}
+
+export interface AddTimerReturn {
+  id: number;
+  name: string;
+  minTime?: number;
+  maxTime?: number;
+  measurement?: TimerMeasure;
+}
+
+export interface TimerUpdateVars {
+  name?: string;
+  minTime?: number;
+  maxTime?: number;
+  measurement?: TimerMeasure;
 }
 
 export type DeleteIngredientReturn = Pick<AddIngredientReturn, "id" | "ingredientGroupId">;

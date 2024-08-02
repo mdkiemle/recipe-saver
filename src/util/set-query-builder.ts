@@ -6,7 +6,7 @@ export type KeysOfObj<T> = {
   [K in keyof T]: string
 }
 
-export const setQueryBuilder = <T extends {}>(stuff: KeysOfObj<T>): string => {
+export const setQueryBuilder = <T extends {}>(stuff: T): string => {
   const values = [];
   for (const key in stuff) {
     values.push([`${key} = "${stuff[key]}"`])

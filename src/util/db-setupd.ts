@@ -66,8 +66,8 @@ export const setup = (db: sqlite.Database): void => {
       CREATE TABLE IF NOT EXISTS timer (
         id INTEGER NOT NULL,
         name TEXT NOT NULL,
-        minTime	INTEGER,
-        maxTime	INTEGER,
+        minTime	NUMERIC,
+        maxTime	NUMERIC,
         measurement TEXT,
         recipeId INTEGER,
         FOREIGN KEY(recipeId)

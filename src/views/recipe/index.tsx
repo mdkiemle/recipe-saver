@@ -10,11 +10,14 @@ import { ToggleInput } from "../../components/ToggleInput";
 import { FolderSection } from "../../components/FolderSection";
 import { ConfirmModal } from "../../modals/";
 import {useNavigate} from "react-router";
+import { TimerSection } from "../../components/TimerSection";
 
 const RecipePage = (): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
   const [showDelete, setShowDelete] = useState(false);
   const nav = useNavigate();
+
+  console.log("Recipe page recipe", recipe);
 
   const toggleDelete = (): void => setShowDelete(prev => !prev);
 
@@ -80,6 +83,7 @@ const RecipePage = (): ReactElement => {
           <h2 className="text-xl">Description</h2>
           <RecipeSection id="description" textValue={recipe.description} onBlur={val => handleUpdateRecipe({description: val})}/>
         </Card>
+        <TimerSection timers={recipe.timers}/>
         {recipe.ingredientGroups.length === 0 && <Card><h2 className="text-xl">Ingredient groups</h2></Card>}
         {recipe.ingredientGroups.map(ig => <IngredientGroupSection key={ig.id} ingredientGroup={ig} />)}
         {isEditing && <Button className="btn-primary self-start" onClick={handleAddGroup}>Add Ingredient Group</Button>}

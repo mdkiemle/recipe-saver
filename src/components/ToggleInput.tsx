@@ -36,15 +36,15 @@ const ToggleInput = ({id, isEditing, value, onBlur, className, editingStyle, max
   return (<>
     {
       isEditing ? <Input
-      id={id}
-      value={text}
-      onBlur={handleBlur}
-      onFocus={handleFocus}
-      onChange={handleChange}
-      className={clsx("rounded-md px-4 py-2", className, editingStyle || "bg-gray-100 cursor-auto")}
-      readOnly={!isEditing}
-      maxLength={maxLength}
-      autoFocus={autoFocus}
+        id={id}
+        value={text}
+        onBlur={handleBlur}
+        onFocus={handleFocus}
+        onChange={handleChange}
+        className={clsx("rounded-md px-4 py-2", className, editingStyle || "bg-gray-100 cursor-auto")}
+        readOnly={!isEditing}
+        maxLength={maxLength}
+        autoFocus={autoFocus}
       /> : <span className={clsx(className)}>{text}</span>
     }
     </>

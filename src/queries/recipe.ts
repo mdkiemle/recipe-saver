@@ -2,22 +2,25 @@ import {ipcMain} from "electron";
 import {database} from "../index";
 import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
-import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates} from "../models/recipe";
+import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer} from "../models/recipe";
 import { returnValues } from "../util/sql-returning";
 import { RecipeReturn } from "../views/dashboard";
 
 
 // Might not be necessary? But just in case I want to use this elsewhere.
 export const recipeQuery = (id: number): string => `
-  select r.id, description, notes, r.name as name, instructions, t.name as timerName,
+  select r.id, description, notes, r.name as name, instructions,
   ig.id as groupId, groupName, i.id as ingredientId, i.measurement as measurement,
-  item, t.measurement as timeMeasurement, minTime, maxTime, t.id as timerId from recipe r
+  item from recipe r
   left join ingredientGroup ig on r.id=ig.recipeId
   left join ingredient i on i.ingredientGroupId=ig.id
-  left join timer t on t.recipeId = r.id
   where r.id = ${id}
   order by ig.id, i.id;
 `;
+
+export const timerQuery = (id: number): string => `
+  select id, name, minTime, maxTime, measurement from timer where recipeId = ${id};
+`
 
 /**
  * select instructions, folder.name as folderName
@@ -45,8 +48,12 @@ ipcMain.on("get-recipe", (event, arg: number) => {
   const sql = recipeQuery(arg);
   database.all(sql, (err: Error, rows: RawReturn[]) => {
     if (err) return event.reply("recipe-retrieved", err.message);
-    const recipe = prettyRecipe(rows);
-    event.reply("recipe-retrieved", recipe);
+    // const recipe = prettyRecipe(rows);
+    database.all(timerQuery(arg),(err, timers: Timer[]) => {
+      if (err) return event.reply("recipe-retrieved", err.message);
+      const recipe = prettyRecipe(rows, timers);
+      event.reply("recipe-retrieved", recipe);
+    });
   });
 });
 
@@ -65,9 +72,26 @@ ipcMain.on("update-recipe", (event, {id, updates}: RecipeUpdates) => {
   });
 });
 
+ipcMain.on("update-timer", (event, {id, updates}: TimerUpdates) => {
+  const setQuery = setQueryBuilder(updates);
+  const returning = returnValues(updates);
+  if (!(setQuery && returning)) return event.reply("update-timer-return", "No update made");
+  const sql = `
+    update timer
+    set ${setQuery}
+    where id = ${id}
+    returning id, ${returning};
+  `;
+
+  database.get(sql, (err, row) => {
+    event.reply("update-timer-return", (err && err.message) || row);
+  });
+});
+
 ipcMain.on("update-ingredient", (event, {id, updates}: IngredientUpdates) => {
   const setQuery = setQueryBuilder(updates);
   const returning = returnValues(updates);
+  console.log("making sure this works still", setQuery, "and returning", returning);
   if (!(setQuery && returning)) return event.reply("update-ingredient-return", "No update made");
   const sql = `
     update ingredient

@@ -139,6 +139,8 @@ export interface TimerUpdateVars {
   measurement?: TimerMeasure;
 }
 
+export type DeleteTimerReturn = Pick<Timer, "id">;
+
 export type DeleteIngredientReturn = Pick<AddIngredientReturn, "id" | "ingredientGroupId">;
 
 export type DeleteGroupReturn = Pick<IngredientGroup, "id">

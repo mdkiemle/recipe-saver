@@ -5,6 +5,7 @@ import { Card } from "./Card";
 import { TimerItem } from "./TimerItem";
 import { Button } from "@headlessui/react";
 import { getRequest } from "../messaging/send";
+import { PiClock } from "react-icons/pi";
 
 export interface TimerSectionProps {
   timers: Timer[];
@@ -15,7 +16,6 @@ const timerDefaults = {name: "New Timer", measurement: "minutes"}
 const TimerSection = ({timers}: TimerSectionProps): ReactElement | undefined => {
   const {isEditing, recipe: {id}, dispatch, setAutoFocus} = useContext(RecipeContext);
   const [startShowing, setStartShowing] = useState(false);
-  console.log('timers', timers.length);
 
   const handleShowTimerCard = (): void => setStartShowing(true);
 
@@ -41,12 +41,16 @@ const TimerSection = ({timers}: TimerSectionProps): ReactElement | undefined => 
   return (
     <Card>
       <h2 className="text-xl mb-4">Timers</h2>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-8 gap-3">
         {timers.map(timer => (<TimerItem key={timer.id} timer={timer}/>))}
       </div>
       {isEditing && <div className="flex items-center gap-3 pt-2">
-        <Button className="btn-secondary" onClick={() => handleAddTimer("single")}>Add Time</Button>
-        <Button className="btn-primary" onClick={() => handleAddTimer("range")} >Add Range</Button>
+        <Button className="btn-secondary" onClick={() => handleAddTimer("single")}>
+          <PiClock /> Add Time
+        </Button>
+        <Button className="btn-primary" onClick={() => handleAddTimer("range")} >
+          <PiClock />Add Range
+        </Button>
       </div>
       }
     </Card>

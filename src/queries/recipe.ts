@@ -2,7 +2,7 @@ import {ipcMain} from "electron";
 import {database} from "../index";
 import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
-import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars} from "../models/recipe";
+import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn} from "../models/recipe";
 import { returnValues } from "../util/sql-returning";
 import { RecipeReturn } from "../views/dashboard";
 import { addQueryBuilder } from "../util/add-query-builder";
@@ -75,7 +75,6 @@ ipcMain.on("update-recipe", (event, {id, updates}: RecipeUpdates) => {
 
 ipcMain.on("add-timer", (event, newTimer: AddTimerVars) => {
   const [values, keys] = addQueryBuilder(newTimer);
-  console.log("addQuery", values, keys);
   const sql = `
     insert into timer (${keys})
     values (${values})
@@ -102,20 +101,9 @@ ipcMain.on("update-timer", (event, {id, updates}: TimerUpdates) => {
   });
 });
 
-ipcMain.on("delete-timer", (event, id: number) => {
-  const sql = `
-    delete from timer where id = ${id}
-    returning id;
-  `;
-  database.get(sql, (err, row: number) => {
-    event.reply("delete-timer-return", (err && err.message) || row);
-  });
-});
-
 ipcMain.on("update-ingredient", (event, {id, updates}: IngredientUpdates) => {
   const setQuery = setQueryBuilder(updates);
   const returning = returnValues(updates);
-  console.log("making sure this works still", setQuery, "and returning", returning);
   if (!(setQuery && returning)) return event.reply("update-ingredient-return", "No update made");
   const sql = `
     update ingredient
@@ -193,7 +181,7 @@ ipcMain.on("delete-ingredient", (event, id: number) => {
     where id = ${id}
     returning id, ingredientGroupId;
   `;
-  database.get(deleteSql, (err, row) => {
+  database.get(deleteSql, (err, row: DeleteIngredientReturn) => {
     event.reply("delete-ingredient-return", (err && err.message) || row);
   });
 });
@@ -204,7 +192,17 @@ ipcMain.on("delete-ingredientGroup", (event, id: number) => {
     where id = ${id}
     returning id;
   `;
-  database.get(deleteSql, (err, row) => {
+  database.get(deleteSql, (err, row: DeleteGroupReturn) => {
     event.reply("delete-ingredientGroup-return", (err && err.message) || row);
+  });
+});
+
+ipcMain.on("delete-timer", (event, id: number) => {
+  const sql = `
+    delete from timer where id = ${id}
+    returning id;
+  `;
+  database.get(sql, (err, row: DeleteGroupReturn) => {
+    event.reply("delete-timer-return", (err && err.message) || row);
   });
 });

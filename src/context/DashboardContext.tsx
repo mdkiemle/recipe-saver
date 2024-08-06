@@ -1,4 +1,4 @@
-import {ReactElement, createContext, useState} from "react";
+import {PropsWithChildren, ReactElement, createContext, useState} from "react";
 import {Setter} from "../models/setter";
 import { Folder } from "../models/recipe";
 
@@ -12,10 +12,6 @@ export interface BaseDashboardContext {
   setActiveSearch: Setter<string>;
 }
 
-export interface DashboardContextProps {
-  children: React.ReactNode;
-}
-
 const DashboardContext = createContext<BaseDashboardContext>({
   search: "",
   setSearch: () => undefined,
@@ -25,13 +21,13 @@ const DashboardContext = createContext<BaseDashboardContext>({
   setActiveSearch: () => undefined,
 });
 
-const DashboardContextProvider = (props: DashboardContextProps): ReactElement => {
+const DashboardContextProvider = ({children}: PropsWithChildren): ReactElement => {
   const [search, setSearch] = useState("");
   const [folder, setFolder] = useState<Folder>({id: 0, name: ""});
   const [activeSearch, setActiveSearch] = useState("");
   return (
     <DashboardContext.Provider value={{search, setSearch, folder, setFolder, activeSearch, setActiveSearch}}>
-      {props.children}
+      {children}
     </DashboardContext.Provider>
   );
 };

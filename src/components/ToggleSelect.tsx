@@ -22,8 +22,8 @@ const ToggleSelect = ({value, options, handleSelect, isEditing}: ToggleSelectPro
       {isEditing ? <div className="relative">
         <Select value={selected} onChange={handleOnChange}
           className={clsx(
-            " w-full appearance-none rounded-lg border-none py-1.5 px-3 text-mds",
-            "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:ring-2",
+            "w-full appearance-none rounded-lg border-2 py-2 px-4 pr-6 text-mds cursor-pointer border-gray-400",
+            "focus:ring-2 data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:ring-2",
             // Make the text of each option black on Windows
             "*:text-black")}
         >
@@ -31,7 +31,7 @@ const ToggleSelect = ({value, options, handleSelect, isEditing}: ToggleSelectPro
             <option key={option} value={option}>{option}</option>
           )}
         </Select>
-        <FaChevronDown className="group pointer-events-none absolute top-2.5 right-0 size-4 fill-black" aria-hidden="true"/>
+        <FaChevronDown className="group pointer-events-none absolute top-4 right-2 size-3 fill-black" aria-hidden="true"/>
       </div> : <span>{selected}</span>}
     </>
   );

@@ -1,10 +1,9 @@
-import {ReactElement, createContext, useReducer, useState} from "react";
-import {AddIngredientReturn, AddTimerReturn, BaseRecipe, DeleteGroupReturn, DeleteIngredientReturn, Folder, RawIngredientGroup, Recipe, RecipeUpdateReturn, Timer} from "../models/recipe";
+import {PropsWithChildren, ReactElement, createContext, useReducer, useState} from "react";
+import {AddIngredientReturn, AddTimerReturn, BaseRecipe, DeleteGroupReturn, DeleteIngredientReturn, DeleteTimerReturn, Folder, RawIngredientGroup, Recipe, RecipeUpdateReturn, Timer} from "../models/recipe";
 import { updateObject } from "../util/update-object";
 import { Setter } from "../models/setter" ;
 import { useLocation } from "react-router";
 import { useMount } from "../hooks/useMount";
-// import { ipcRenderer } from "electron";
 import { getRequest } from "../messaging/send";
 
 const baseRecipe: Recipe = {
@@ -29,16 +28,13 @@ export interface BaseRecipeContext {
   setAutoFocus: Setter<boolean>;
 }
 
-export interface RecipeContextProps {
-  children: React.ReactNode;
-}
-
 export type Action =
   {type: "UPDATE_RECIPE", payload: RecipeUpdateReturn} |
   {type: "UPDATE_GROUPNAME" | "ADD_ING_GROUP", payload: RawIngredientGroup} |
   {type: "ADD_INGREDIENT" | "UPDATE_INGREDIENT", payload: AddIngredientReturn} |
   {type: "DELETE_INGREDIENT", payload: DeleteIngredientReturn} |
   {type: "DELETE_GROUP", payload: DeleteGroupReturn} |
+  {type: "DELETE_TIMER", payload: DeleteTimerReturn} |
   {type: "ADD_TIMER" | "UPDATE_TIMER", payload: Timer};
 
 const RecipeContext = createContext<BaseRecipeContext>({
@@ -142,12 +138,21 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
         ingredientGroups: copyGroup,
       });
     }
+    case "DELETE_TIMER": {
+      const copyTimer = [...state.timers];
+      const idx = copyTimer.findIndex(timer => timer.id = action.payload.id);
+      copyTimer.splice(idx, 1);
+      return updateObject(state, {
+        ...state,
+        timers: copyTimer,
+      });
+    }
     default:
       return state;
   }
 };
 
-const RecipeContextProvider = (props: RecipeContextProps): ReactElement => {
+const RecipeContextProvider = (props: PropsWithChildren): ReactElement => {
   const {state: id} = useLocation();
   const [recipe, dispatch] = useReducer(recipeReducer, baseRecipe);
   const [isEditing, setIsEditing] = useState(false);

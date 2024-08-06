@@ -1,6 +1,6 @@
 import { Input } from "@headlessui/react";
 import {clsx} from "clsx";
-import React, {ReactElement, useState} from "react";
+import React, {ReactElement, useEffect, useState} from "react";
 
 export interface ToggleNumberInputProps {
   id: string;
@@ -24,6 +24,11 @@ const ToggleNumberInput = ({id, isEditing, value, onBlur, className, editingStyl
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>): void => {
     e.target.select();
   };
+
+  // For when the measurement changes in TimerItem
+  useEffect(() => {
+    if (value !== number) setNumber(value);
+  }, [value])
   return (
     <>
       {isEditing ? <Input
@@ -31,7 +36,7 @@ const ToggleNumberInput = ({id, isEditing, value, onBlur, className, editingStyl
         type="number"
         value={number}
         onChange={handleChange}
-        className={clsx("rounded-md px-4 py-2", className, editingStyle || "bg-gray-100 cursor-auto")}
+        className={clsx("rounded-md px-4 py-2", className, editingStyle || "border-2 border-gray-400 cursor-auto")}
         readOnly={!isEditing}
         maxLength={maxLength}
         autoFocus={autoFocus}

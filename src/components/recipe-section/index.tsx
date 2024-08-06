@@ -31,7 +31,7 @@ const RecipeSection = ({id, textValue, onBlur}: RecipeSectionProps): ReactElemen
       value={value ?? ""}
       onBlur={handleBlur}
       onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setValue(e.target.value)}
-      className={clsx("resize-none rounded-md px-4 py-2 w-full bg-gray-100", !isEditing && "bg-transparent outline-none cursor-auto")}
+      className={clsx("resize-none rounded-md px-4 py-2 w-full", !isEditing ? "ring-0 bg-transparent border-none outline-none cursor-auto" : "ring-2 ring-gray-400")}
       placeholder={`There is currently no ${id} for this recipe`}
       readOnly={!isEditing}
     />

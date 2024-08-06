@@ -11,13 +11,12 @@ import { FolderSection } from "../../components/FolderSection";
 import { ConfirmModal } from "../../modals/";
 import {useNavigate} from "react-router";
 import { TimerSection } from "../../components/TimerSection";
+import {AiOutlineGroup} from "react-icons/ai"
 
 const RecipePage = (): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
   const [showDelete, setShowDelete] = useState(false);
   const nav = useNavigate();
-
-  console.log("Recipe page recipe", recipe);
 
   const toggleDelete = (): void => setShowDelete(prev => !prev);
 
@@ -80,19 +79,21 @@ const RecipePage = (): ReactElement => {
           </Field>
         </Card>
         <Card>
-          <h2 className="text-xl">Description</h2>
+          <h2 className="text-xl mb-4">Description</h2>
           <RecipeSection id="description" textValue={recipe.description} onBlur={val => handleUpdateRecipe({description: val})}/>
         </Card>
         <TimerSection timers={recipe.timers}/>
         {recipe.ingredientGroups.length === 0 && <Card><h2 className="text-xl">Ingredient groups</h2></Card>}
         {recipe.ingredientGroups.map(ig => <IngredientGroupSection key={ig.id} ingredientGroup={ig} />)}
-        {isEditing && <Button className="btn-primary self-start" onClick={handleAddGroup}>Add Ingredient Group</Button>}
+        {isEditing && <Button className="btn-primary self-start" onClick={handleAddGroup}>
+          <AiOutlineGroup /> Add Ingredient Group
+        </Button>}
         <Card>
-          <h2 className="text-xl">Instructions</h2>
+          <h2 className="text-xl mb-4">Instructions</h2>
           <RecipeSection id="instructions" textValue={recipe.instructions} onBlur={val => handleUpdateRecipe({instructions: val})}/>
         </Card>
         <Card>
-          <h2 className="text-xl">Notes</h2>
+          <h2 className="text-xl mb-4">Notes</h2>
           <RecipeSection id="notes" textValue={recipe.notes ?? ""} onBlur={val => handleUpdateRecipe({notes: val})} />
         </Card>
         {isEditing && <Button className="btn-delete self-end" onClick={toggleDelete}>Delete</Button>}

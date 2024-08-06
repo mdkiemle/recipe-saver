@@ -1,12 +1,7 @@
-import {ReactElement, createContext, useReducer} from "react";
+import {PropsWithChildren, ReactElement, createContext, useReducer} from "react";
 import { Folder } from "../models/recipe";
 import { useMount } from "../hooks/useMount";
 import { getRequest } from "../messaging/send";
-
-const baseFolder: Folder = {
-  id: 0,
-  name: "",
-};
 
 export interface BaseFolderContext {
   folders: Folder[];
@@ -17,10 +12,6 @@ const FolderContext = createContext<BaseFolderContext>({
   folders: [],
   dispatch: () => undefined,
 });
-
-export interface FolderContextProps {
-  children: React.ReactNode;
-}
 
 export type FolderAction = 
   {type: "UPDATE_FOLDERS", payload: Folder[]} |
@@ -37,7 +28,7 @@ const folderReducer = (state: Folder[], action: FolderAction): Folder[] => {
   }
 };
 
-const FolderContextProvider = ({children}: FolderContextProps): ReactElement => {
+const FolderContextProvider = ({children}: PropsWithChildren): ReactElement => {
   const [folders, dispatch] = useReducer(folderReducer, []);
   useMount(() => {
     getRequest<Folder[], undefined>("get-all-folders", "folders-get", undefined)

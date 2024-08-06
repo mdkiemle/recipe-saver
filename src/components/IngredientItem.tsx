@@ -33,7 +33,6 @@ const IngredientItem = ({ingredient, isEditing}: IngredientItemProps): ReactElem
         value={ingredient.measurement}
         className="px-1 py-1 col-span-2"
         onBlur={val => handleIngUpdate({measurement: val})}
-        editingStyle="bg-gray-100"
         autoFocus={autoFocus}
       />
       <ToggleInput
@@ -42,7 +41,6 @@ const IngredientItem = ({ingredient, isEditing}: IngredientItemProps): ReactElem
         value={ingredient.item}
         className="px-1 py-1 col-span-4"
         onBlur={val => handleIngUpdate({item: val})}
-        editingStyle="bg-gray-100"
       />
       {isEditing && <PiTrash onClick={handleDelete} className="fill-red-500 cursor-pointer"/>}
     </li>

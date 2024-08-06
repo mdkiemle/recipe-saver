@@ -50,6 +50,7 @@ const IngredientGroupSection = ({ingredientGroup: {id, ingredients, groupName}}:
         className="text-xl col-span-5"
         onBlur={handleChangeGroup}
         autoFocus={autoFocus}
+        type="h2"
       />
       <IngredientList ingredients={ingredients}/>
       { isEditing && <>

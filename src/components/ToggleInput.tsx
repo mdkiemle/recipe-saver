@@ -1,4 +1,4 @@
-import React, {ReactElement, useEffect, useState} from "react";
+import React, {ReactElement, useEffect, useMemo, useRef, useState} from "react";
 import {clsx} from "clsx";
 import { Input } from "@headlessui/react";
 
@@ -12,10 +12,12 @@ export interface ToggleInputProps {
   maxLength?: number;
   validate?: boolean;
   autoFocus?: boolean;
+  type?: keyof React.ReactHTML;
 }
 
-const ToggleInput = ({id, isEditing, value, onBlur, className, editingStyle, maxLength, validate = false, autoFocus = false}: ToggleInputProps): ReactElement => {
+const ToggleInput = ({id, isEditing, value, onBlur, className, editingStyle, maxLength, validate = false, autoFocus = false, type = "span"}: ToggleInputProps): ReactElement => {
   const [text, setText] = useState(value ?? "");
+  const ref = useRef<HTMLInputElement>(null)
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>): void => {
     if (!isEditing || value === e.target.value) return;
@@ -29,6 +31,11 @@ const ToggleInput = ({id, isEditing, value, onBlur, className, editingStyle, max
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>): void => {
     e.target.select();
   };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.key === "Enter" && ref.current) ref.current.blur();
+  };
+  
+  const el = useMemo(() => React.createElement(type, {className: clsx(className)}, text), [text, className]);
 
   useEffect(() => {
     if (value !== text) setText(value);
@@ -36,16 +43,18 @@ const ToggleInput = ({id, isEditing, value, onBlur, className, editingStyle, max
   return (<>
     {
       isEditing ? <Input
+        ref={ref}
         id={id}
         value={text}
         onBlur={handleBlur}
         onFocus={handleFocus}
+        onKeyDown={handleKeyDown}
         onChange={handleChange}
         className={clsx("rounded-md px-4 py-2", className, editingStyle || "border-2 border-gray-400 cursor-auto")}
         readOnly={!isEditing}
         maxLength={maxLength}
         autoFocus={autoFocus}
-      /> : <span className={clsx(className)}>{text}</span>
+      /> : el
     }
     </>
   );

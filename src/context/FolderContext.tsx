@@ -15,7 +15,7 @@ const FolderContext = createContext<BaseFolderContext>({
 
 export type FolderAction = 
   {type: "UPDATE_FOLDERS", payload: Folder[]} |
-  {type: "ADD_FOLDER", payload: Folder};
+  {type: "ADD_FOLDER" | "UPDATE_FOLDER", payload: Folder};
 
 const folderReducer = (state: Folder[], action: FolderAction): Folder[] => {
   switch (action.type) {
@@ -23,6 +23,12 @@ const folderReducer = (state: Folder[], action: FolderAction): Folder[] => {
       return [...action.payload]
     case "ADD_FOLDER":
       return [...state, action.payload];
+    case "UPDATE_FOLDER": {
+      const copy = [...state];
+      const idx = copy.findIndex(folder => folder?.id === action.payload?.id);
+      copy.splice(idx, 1, action.payload);
+      return [...copy];
+    }
     default: 
       return state;
   }

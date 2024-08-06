@@ -2,7 +2,7 @@ import {ipcMain} from "electron";
 import {database} from "../index";
 import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
-import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn} from "../models/recipe";
+import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn, Folder} from "../models/recipe";
 import { returnValues } from "../util/sql-returning";
 import { RecipeReturn } from "../views/dashboard";
 import { addQueryBuilder } from "../util/add-query-builder";
@@ -98,6 +98,18 @@ ipcMain.on("update-timer", (event, {id, updates}: TimerUpdates) => {
 
   database.get(sql, (err, row) => {
     event.reply("update-timer-return", (err && err.message) || row);
+  });
+});
+
+ipcMain.on("update-folder", (event, {id, name}: Folder) => {
+  const sql = `
+    update folder
+    set name = "${name}"
+    where id = ${id}
+    returning *;
+  `;
+  database.get(sql, (err, row) => {
+    event.reply("update-folder-return", (err && err.message) || row);
   });
 });
 

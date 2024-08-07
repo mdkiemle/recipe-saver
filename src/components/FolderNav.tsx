@@ -21,6 +21,7 @@ const FolderNav = (): ReactElement | undefined => {
 
   const handleInput = (value: string): void => {
     setEditFolder(false);
+    if (value === folder.name) return;
     getRequest<Folder, Folder>("update-folder", "update-folder-return", {id: folder.id, name: value})
     .then(res => {
       dispatch({type: "UPDATE_FOLDER", payload: res});
@@ -40,6 +41,7 @@ const FolderNav = (): ReactElement | undefined => {
         type="h2"
         value={folder.name}
         onBlur={handleInput}
+        validate
       />
       {!editFolder && <PiPen onClick={toggleEdit} className="cursor-pointer"/> }
     </div>

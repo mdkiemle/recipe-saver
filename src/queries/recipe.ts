@@ -12,7 +12,7 @@ import { addQueryBuilder } from "../util/add-query-builder";
 export const recipeQuery = (id: number): string => `
   select r.id, description, notes, r.name as name, instructions,
   ig.id as groupId, groupName, i.id as ingredientId, i.measurement as measurement,
-  item from recipe r
+  item, totalTime from recipe r
   left join ingredientGroup ig on r.id=ig.recipeId
   left join ingredient i on i.ingredientGroupId=ig.id
   where r.id = ${id}
@@ -70,6 +70,22 @@ ipcMain.on("update-recipe", (event, {id, updates}: RecipeUpdates) => {
   `;
   database.get(sql, (err, row) => {
     event.reply("update-recipe-return", (err && err.message) || row);
+  });
+});
+
+ipcMain.on("update-totalTime", (event, id: number) => {
+  const sql = `
+    update recipe
+    set totalTime = (
+      select sum (maxTime)
+      from timer
+      where timer.recipeId = ${id}
+    )
+    where id = ${id}
+    returning id, totalTime;
+  `;
+  database.get(sql, (err, row) => {
+    event.reply("update-totalTime-return", (err && err.message) || row);
   });
 });
 

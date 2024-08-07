@@ -82,7 +82,7 @@ const RecipePage = (): ReactElement => {
           <h2 className="text-xl mb-4">Description</h2>
           <RecipeSection id="description" textValue={recipe.description} onBlur={val => handleUpdateRecipe({description: val})}/>
         </Card>
-        <TimerSection timers={recipe.timers}/>
+        <TimerSection />
         {recipe.ingredientGroups.length === 0 && <Card><h2 className="text-xl">Ingredient groups</h2></Card>}
         {recipe.ingredientGroups.map(ig => <IngredientGroupSection key={ig.id} ingredientGroup={ig} />)}
         {isEditing && <Button className="btn-primary self-start" onClick={handleAddGroup}>

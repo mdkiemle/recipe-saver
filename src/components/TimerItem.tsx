@@ -1,5 +1,5 @@
 import React, {ReactElement, useContext, useMemo} from "react";
-import { AddTimerReturn, DeleteTimerReturn, Timer, TimerMeasure, TimerUpdates, TimerUpdateVars } from "../models/recipe";
+import { AddTimerReturn, DeleteTimerReturn, RecipeUpdateReturn, Timer, TimerMeasure, TimerUpdates, TimerUpdateVars } from "../models/recipe";
 import { ToggleInput } from "./ToggleInput";
 import { getRequest } from "../messaging/send";
 import { RecipeContext } from "../context/RecipeContext";
@@ -13,7 +13,7 @@ export interface TimerProps {
 }
 
 const TimerItem = ({timer}: TimerProps): ReactElement => {
-  const {isEditing, dispatch, autoFocus} = useContext(RecipeContext);
+  const {isEditing, dispatch, autoFocus, recipe: {id}} = useContext(RecipeContext);
   const {maxTime, minTime, measurement} = timer;
   const handleTimerUpdate = (updates:  Pick<TimerUpdateVars, "measurement" | "name">): void => {
     getRequest<AddTimerReturn, TimerUpdates>("update-timer", "update-timer-return", {id: timer.id, updates})
@@ -24,9 +24,16 @@ const TimerItem = ({timer}: TimerProps): ReactElement => {
 
   const handleTimeUpdates = (type: "minTime" | "maxTime", value: number): void => {
     const converted = measurement === "hours" ? value * 60 : value;
+    if ((type === "minTime" && converted === timer.minTime) || (type === "maxTime" && converted === timer.maxTime)) return;
     getRequest<AddTimerReturn, TimerUpdates>("update-timer", "update-timer-return", {id: timer.id, updates: {[type]: converted}})
     .then(res => {
       dispatch({type: "UPDATE_TIMER", payload: res});
+      // Kind of want to do this a different way but I guess it's fine.
+      if (type === "minTime") return;
+      getRequest<RecipeUpdateReturn, number>("update-totalTime", "update-totalTime-return", id)
+      .then(res => {
+        dispatch({type: "UPDATE_RECIPE", payload: res})
+      });
     });
   };
 
@@ -34,6 +41,11 @@ const TimerItem = ({timer}: TimerProps): ReactElement => {
     getRequest<DeleteTimerReturn, number>("delete-timer", "delete-timer-return", timer.id)
     .then(res => {
       dispatch({type: "DELETE_TIMER", payload: res});
+      // Kind of want to do this a different way but I guess it's fine.
+      getRequest<RecipeUpdateReturn, number>("update-totalTime", "update-totalTime-return", id)
+      .then(res => {
+        dispatch({type: "UPDATE_RECIPE", payload: res})
+      });
     });
   }
 

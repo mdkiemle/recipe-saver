@@ -14,6 +14,7 @@ const baseRecipe: Recipe = {
   timers: [],
   description: "",
   notes: "",
+  totalTime: 0,
 };
 
 export interface BaseRecipeContext {

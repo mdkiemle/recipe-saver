@@ -6,15 +6,12 @@ import { TimerItem } from "./TimerItem";
 import { Button } from "@headlessui/react";
 import { getRequest } from "../messaging/send";
 import { PiClock } from "react-icons/pi";
-
-export interface TimerSectionProps {
-  timers: Timer[];
-}
+import { prettyTime } from "../util/pretty-time";
 
 const timerDefaults = {name: "New Timer", measurement: "minutes"}
 
-const TimerSection = ({timers}: TimerSectionProps): ReactElement | undefined => {
-  const {isEditing, recipe: {id}, dispatch, setAutoFocus} = useContext(RecipeContext);
+const TimerSection = (): ReactElement | undefined => {
+  const {isEditing, recipe: {id, timers, totalTime}, dispatch, setAutoFocus} = useContext(RecipeContext);
   const [startShowing, setStartShowing] = useState(false);
 
   const handleShowTimerCard = (): void => setStartShowing(true);
@@ -53,6 +50,7 @@ const TimerSection = ({timers}: TimerSectionProps): ReactElement | undefined => 
         </Button>
       </div>
       }
+      <span>Total time is about {prettyTime(totalTime)}</span>
     </Card>
   );
 };

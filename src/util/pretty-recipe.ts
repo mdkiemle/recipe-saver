@@ -16,13 +16,12 @@ export interface RawReturn {
   ingredientId?: number;
   measurement?: string;
   item?: string;
+  totalTime?: number;
 }
 
 export const prettyRecipe = (tableReturn: RawReturn[], timers: Timer[]): Recipe => {
   const uniqueGroups = groupBy(tableReturn, "groupId");
-  // const uniqueTimers = groupBy(tableReturn, "timerId");
   const keys = Object.keys(uniqueGroups);
-  // const timerKeys = Object.keys(uniqueTimers);
   const ingGroups: IngredientGroup[] = [];
   for (const key of keys) {
     const ingT: Ingredient[] = uniqueGroups[key].flatMap(g => {
@@ -50,6 +49,7 @@ export const prettyRecipe = (tableReturn: RawReturn[], timers: Timer[]): Recipe 
     notes: tableReturn[0]?.notes,
     ingredientGroups: ingGroups,
     timers,
+    totalTime: tableReturn[0].totalTime || 0,
   };
   return recipe;
 };

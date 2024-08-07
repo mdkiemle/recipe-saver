@@ -1,5 +1,18 @@
 import sqlite from "sqlite3";
 
+const CURRENT_VERSION = 1;
+
+// I'll have to figure out a better way to do this I'm sure but should work for now.
+export const update = (version: number, db: sqlite.Database): void => {
+  if (version === CURRENT_VERSION) return console.log("All up to date!");
+  if (version === 0) {
+    db.exec("ALTER TABLE recipe ADD COLUMN totalTime INTEGER", err => {
+      if (err && err.message) console.log("error I guess: ", err.message);
+      db.run(`PRAGMA user_version = ${CURRENT_VERSION}`);
+    });
+  }
+};
+
 export const setup = (db: sqlite.Database): void => {
 	db.serialize(() => {
 		db.run(`
@@ -14,7 +27,8 @@ export const setup = (db: sqlite.Database): void => {
 				name TEXT NOT NULL,
 				description TEXT,
 				notes TEXT,
-				instructions TEXT
+				instructions TEXT,
+        totalTime INTEGER
 			)
 		`);
 		db.run(`
@@ -73,5 +87,8 @@ export const setup = (db: sqlite.Database): void => {
         PRIMARY KEY(id AUTOINCREMENT)
       );
     `)
+    db.get("PRAGMA user_version", (err, {user_version}) => {
+      update(user_version, db);
+    });
 	});
 }

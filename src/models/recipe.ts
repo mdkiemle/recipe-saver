@@ -45,6 +45,7 @@ export interface BaseRecipe {
 export interface Recipe extends BaseRecipe {
   ingredientGroups: IngredientGroup[];
   timers: Timer[];
+  totalTime: number;
 }
 
 export interface SearchRecipe extends BaseRecipe {
@@ -73,6 +74,7 @@ export interface RecipeUpdateVars {
   instructions: string;
   notes: string;
   description: string; 
+  totalTime: number;
 }
 
 export interface RecipeUpdates {

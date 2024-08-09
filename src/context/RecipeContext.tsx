@@ -1,4 +1,4 @@
-import {PropsWithChildren, ReactElement, createContext, useReducer, useState} from "react";
+import {PropsWithChildren, ReactElement, createContext, useMemo, useReducer, useState} from "react";
 import {AddIngredientReturn, AddTimerReturn, BaseRecipe, DeleteGroupReturn, DeleteIngredientReturn, DeleteTimerReturn, Folder, RawIngredientGroup, Recipe, RecipeUpdateReturn, Timer} from "../models/recipe";
 import { updateObject } from "../util/update-object";
 import { Setter } from "../models/setter" ;
@@ -176,8 +176,22 @@ const RecipeContextProvider = (props: PropsWithChildren): ReactElement => {
       setFolders(res);
     })
   });
+
+  // Maybe overkill. Should look into cost on with and without.
+  const contextValue = useMemo(() => ({
+    recipe,
+    isEditing,
+    loading,
+    folders,
+    autoFocus,
+    dispatch,
+    setIsEditing,
+    setFolders,
+    setAutoFocus,
+  }), [recipe, dispatch, isEditing, autoFocus, setAutoFocus, loading, folders, setFolders, setIsEditing]);
+
   return (
-    <RecipeContext.Provider value={{recipe, dispatch, isEditing, setIsEditing, loading, folders, setFolders, autoFocus, setAutoFocus}}>
+    <RecipeContext.Provider value={contextValue}>
       {props.children}
     </RecipeContext.Provider>
   );

@@ -4,7 +4,6 @@ import { ToggleInput } from "./ToggleInput";
 import { getRequest } from "../messaging/send";
 import { RecipeContext } from "../context/RecipeContext";
 import { ToggleNumberInput } from "./ToggleNumberInput";
-import { Select } from "@headlessui/react";
 import { ToggleSelect } from "./ToggleSelect";
 import { PiTrash } from "react-icons/pi";
 

@@ -32,7 +32,7 @@ where fr.folderId = 3;
  */
 
 ipcMain.on("get-recipes", (event) => {
-  const sql = "select id, name, description from recipe";
+  const sql = "select id, name from recipe";
   database.all(sql, (err: Error, rows: RecipeReturn) => {
     event.reply("get-recipes-return", (err && err.message) || rows);
   });

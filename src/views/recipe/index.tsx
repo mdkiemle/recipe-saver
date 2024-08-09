@@ -12,6 +12,7 @@ import { ConfirmModal } from "../../modals/";
 import {useNavigate} from "react-router";
 import { TimerSection } from "../../components/TimerSection";
 import {AiOutlineGroup} from "react-icons/ai"
+import { RecipeLinks } from "../../components/RecipeLinks";
 
 const RecipePage = (): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
@@ -92,6 +93,7 @@ const RecipePage = (): ReactElement => {
           <h2 className="text-xl mb-4">Instructions</h2>
           <RecipeSection id="instructions" textValue={recipe.instructions} onBlur={val => handleUpdateRecipe({instructions: val})}/>
         </Card>
+        <RecipeLinks />
         <Card>
           <h2 className="text-xl mb-4">Notes</h2>
           <RecipeSection id="notes" textValue={recipe.notes ?? ""} onBlur={val => handleUpdateRecipe({notes: val})} />

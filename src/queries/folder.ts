@@ -64,3 +64,15 @@ ipcMain.on("get-folders-for-recipe", (event, arg: number) => {
     event.reply("get-folders-for-recipe-return", (err && err.message) || rows);
   });
 });
+
+ipcMain.on("get-recipe-links", (event, arg: number) => {
+  const sql = `
+    select r2.id as id, r2.name as name from recipeToRecipe rr
+    left join recipe r1 on r1.id = rr.recipeParentId
+    left join recipe r2 on r2.id = rr.recipeChildId
+    where r1.id = ${arg};
+  `;
+  database.all(sql, (err: Error, rows: IdName) => {
+    event.reply("get-recipe-links-return", (err && err.message) || rows)    
+  });
+});

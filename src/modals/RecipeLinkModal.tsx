@@ -24,7 +24,7 @@ const RecipeLinkModal = ({isOpen, onClose}: RecipeLinkModalProps): ReactElement 
 
   const handleImportIngGroups = (parentId: number, childId: number): void => {
     console.log("oh god oh fuck oh god");
-    getRequest("copyGroupsWithIds", "copyGroupsWithIds-return", {parentId, childId})
+    getRequest("copyGroupsWithIngs", "copyGroupsWithIngs-return", {parentId, childId})
     .then(res => {
       console.log("response from copy", res);
       onClose();

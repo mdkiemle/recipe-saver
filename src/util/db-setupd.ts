@@ -1,13 +1,18 @@
 import sqlite from "sqlite3";
 
-const CURRENT_VERSION = 1;
+const CURRENT_VERSION = 2;
 
 // I'll have to figure out a better way to do this I'm sure but should work for now.
 export const update = (version: number, db: sqlite.Database): void => {
   if (version === CURRENT_VERSION) return console.log("All up to date!");
-  if (version === 0) {
+  if (version < 1) {
     db.exec("ALTER TABLE recipe ADD COLUMN totalTime INTEGER", err => {
       if (err && err.message) console.log("error I guess: ", err.message);
+    });
+  }
+  if (version < 2) {
+    db.exec("ALTER TABLE recipeToRecipe ADD COLUMN label TEXT", err => {
+      if (err && err.message) console.log("error from updating: ", err.message);
       db.run(`PRAGMA user_version = ${CURRENT_VERSION}`);
     });
   }

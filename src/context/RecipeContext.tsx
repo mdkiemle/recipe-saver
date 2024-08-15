@@ -1,9 +1,8 @@
-import {PropsWithChildren, ReactElement, createContext, useMemo, useReducer, useState} from "react";
-import {AddIngredientReturn, AddTimerReturn, BaseRecipe, DeleteGroupReturn, DeleteIngredientReturn, DeleteTimerReturn, Folder, RawIngredientGroup, Recipe, RecipeUpdateReturn, Timer} from "../models/recipe";
+import {PropsWithChildren, ReactElement, act, createContext, useEffect, useMemo, useReducer, useState} from "react";
+import {AddIngredientReturn, DeleteGroupReturn, DeleteIngredientReturn, DeleteTimerReturn, Folder, RawIngredientGroup, Recipe, RecipeLink, RecipeUpdateReturn, Timer} from "../models/recipe";
 import { updateObject } from "../util/update-object";
 import { Setter } from "../models/setter" ;
-import { useLocation } from "react-router";
-import { useMount } from "../hooks/useMount";
+import {useParams} from "react-router";
 import { getRequest } from "../messaging/send";
 
 const baseRecipe: Recipe = {
@@ -15,6 +14,8 @@ const baseRecipe: Recipe = {
   description: "",
   notes: "",
   totalTime: 0,
+  recipeLinks: [],
+  // Could add folders here
 };
 
 export interface BaseRecipeContext {
@@ -36,7 +37,9 @@ export type Action =
   {type: "DELETE_INGREDIENT", payload: DeleteIngredientReturn} |
   {type: "DELETE_GROUP", payload: DeleteGroupReturn} |
   {type: "DELETE_TIMER", payload: DeleteTimerReturn} |
-  {type: "ADD_TIMER" | "UPDATE_TIMER", payload: Timer};
+  {type: "ADD_TIMER" | "UPDATE_TIMER", payload: Timer} |
+  {type: "ADD_LINKS", payload: RecipeLink[]} | // Mostly for querying update
+  {type: "UPDATE_LINK" | "ADD_LINK", payload: RecipeLink};
 
 const RecipeContext = createContext<BaseRecipeContext>({
   recipe: baseRecipe,
@@ -54,12 +57,10 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
   switch(action.type) {
     case "UPDATE_RECIPE":
       return updateObject(state, {
-        ...state,
         ...action.payload,
       });
     case "UPDATE_GROUPNAME":
       return updateObject(state, {
-        ...state,
         ingredientGroups: state.ingredientGroups.map(ig => {
           if (ig.id === action.payload?.id) {
             return {
@@ -72,12 +73,10 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       });
     case "ADD_ING_GROUP":
       return updateObject(state, {
-        ...state,
         ingredientGroups: [...state.ingredientGroups, {...action.payload, ingredients: []}]
       });
     case "ADD_TIMER": {
       return updateObject(state, {
-        ...state,
         timers: [...state.timers, action.payload],
       });
     }
@@ -90,7 +89,6 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       });
       copiedTimers.splice(idx, 1, updatedTimer);
       return updateObject(state, {
-        ...state,
         timers: copiedTimers,
       })
     }
@@ -100,7 +98,6 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       const idx = copyGroup.findIndex(group => group.id === ingredientGroupId);
       copyGroup[idx].ingredients.push(ing);
       return updateObject(state, {
-        ...state,
         ingredientGroups: copyGroup,
       });
     }
@@ -115,7 +112,6 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       });
       copyGroup[idx].ingredients.splice(idxIng, 1, updatedIngredient);
       return updateObject(state, {
-        ...state,
         ingredientGroups: copyGroup,
       });
     }
@@ -126,7 +122,6 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       const idxIng = copyGroup[idx].ingredients.findIndex(ing => ing.id === id);
       copyGroup[idx].ingredients.splice(idxIng, 1);
       return updateObject(state, {
-        ...state,
         ingredientGroups: copyGroup,
       });
     }
@@ -135,7 +130,6 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       const idx = copyGroup.findIndex(group => group.id === action.payload.id);
       copyGroup.splice(idx, 1);
       return updateObject(state, {
-        ...state,
         ingredientGroups: copyGroup,
       });
     }
@@ -144,26 +138,33 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       const idx = copyTimer.findIndex(timer => timer.id = action.payload.id);
       copyTimer.splice(idx, 1);
       return updateObject(state, {
-        ...state,
         timers: copyTimer,
       });
     }
+    case "ADD_LINKS":
+      return updateObject(state, {
+        recipeLinks: [...state.recipeLinks, ...action.payload],
+      });
+    case "ADD_LINK":
+      return updateObject(state, {
+        recipeLinks: [...state.recipeLinks, action.payload],
+      });
     default:
       return state;
   }
 };
 
 const RecipeContextProvider = (props: PropsWithChildren): ReactElement => {
-  const {state: id} = useLocation();
+  const {recipeId} = useParams<{recipeId: string}>();
   const [recipe, dispatch] = useReducer(recipeReducer, baseRecipe);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [autoFocus, setAutoFocus] = useState(false);
-  useMount(() => {
-    if (!id) return;
+  useEffect(() => {
+    if (!recipeId) return;
     setLoading(true);
-    getRequest<Recipe, number>("get-recipe", "recipe-retrieved", id).then(res => {
+    getRequest<Recipe, string>("get-recipe", "recipe-retrieved", recipeId).then(res => {
       // setRecipe(res);
       dispatch({type: "UPDATE_RECIPE", payload: res});
       setLoading(false);
@@ -171,11 +172,11 @@ const RecipeContextProvider = (props: PropsWithChildren): ReactElement => {
       console.error("Uh oh: ", err.message);
       setLoading(false);
     });
-    getRequest<Folder[], number>("get-folders-for-recipe", "get-folders-for-recipe-return", id)
+    getRequest<Folder[], string>("get-folders-for-recipe", "get-folders-for-recipe-return", recipeId)
     .then(res => {
       setFolders(res);
-    })
-  });
+    });
+  }, [recipeId]);
 
   // Maybe overkill. Should look into cost on with and without.
   const contextValue = useMemo(() => ({

@@ -1,5 +1,4 @@
 import React, {ReactElement, useState} from "react";
-import { IdName } from "../models/generic";
 import { Select } from "@headlessui/react";
 import clsx from "clsx";
 import { FaChevronDown } from "react-icons/fa";

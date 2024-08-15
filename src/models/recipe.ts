@@ -1,4 +1,5 @@
 import { KeysOfObj } from "../util/set-query-builder";
+import { IdName } from "./generic";
 
 export interface Ingredient {
   id: number;
@@ -46,6 +47,7 @@ export interface Recipe extends BaseRecipe {
   ingredientGroups: IngredientGroup[];
   timers: Timer[];
   totalTime: number;
+  recipeLinks: RecipeLink[];
 }
 
 export interface SearchRecipe extends BaseRecipe {
@@ -87,6 +89,8 @@ export interface IngredientUpdates {
   updates: Partial<IngredientUpdateVars>;
 }
 
+export type RecipeLink = IdName & {label?: string};
+
 export interface TimerUpdates {
   id: number;
   updates: Partial<TimerUpdateVars>;
@@ -104,6 +108,11 @@ export interface RecipeTextUpdate {
   text: string;
 }
 
+export interface AddRecipeLinkVars {
+  recipeParentId: number;
+  recipeChildId: number;
+  label?: string;
+}
 export interface AddIngredientGroup {
   recipeId: number;
   groupName: string;

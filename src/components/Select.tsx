@@ -1,6 +1,6 @@
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import clsx from "clsx";
-import React, {ReactElement, useMemo} from "react";
+import {ReactElement} from "react";
 import { IdName } from "../models/generic";
 import { Setter } from "../models/setter";
 import { FaChevronDown } from "react-icons/fa";
@@ -20,10 +20,6 @@ const Select = <T extends IdName>({selected, setSelected, options}: SelectProps<
         )}
       >
         {options.find(option => option.id === selected)?.name}
-        {/* <ChevronDownIcon
-          className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
-          aria-hidden="true"
-        /> */}
         <FaChevronDown
           className="group pointer-events-none absolute top-3 right-2.5 size-4 fill-black/60"
           aria-hidden="true"

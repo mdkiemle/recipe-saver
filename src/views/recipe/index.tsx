@@ -8,7 +8,7 @@ import { IngredientGroupSection } from "../../components/IngredientGroupSection"
 import { Card } from "../../components/Card";
 import { ToggleInput } from "../../components/ToggleInput";
 import { FolderSection } from "../../components/FolderSection";
-import { ConfirmModal } from "../../modals/";
+import { ConfirmModal, RecipeLinkModal } from "../../modals/";
 import {useNavigate} from "react-router";
 import { TimerSection } from "../../components/TimerSection";
 import {AiOutlineGroup} from "react-icons/ai"
@@ -17,9 +17,12 @@ import { RecipeLinks } from "../../components/RecipeLinks";
 const RecipePage = (): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
   const [showDelete, setShowDelete] = useState(false);
+  const [linkModal, setLinkModal] = useState(false);
+
   const nav = useNavigate();
 
   const toggleDelete = (): void => setShowDelete(prev => !prev);
+  const toggleLinkModal = (): void => setLinkModal(prev => !prev);
 
   const handleUpdateRecipe = (updates: Partial<RecipeUpdateVars>): void => {
     if (updates?.name === "") return;
@@ -93,7 +96,7 @@ const RecipePage = (): ReactElement => {
           <h2 className="text-xl mb-4">Instructions</h2>
           <RecipeSection id="instructions" textValue={recipe.instructions} onBlur={val => handleUpdateRecipe({instructions: val})}/>
         </Card>
-        <RecipeLinks />
+        <RecipeLinks openModal={toggleLinkModal}/>
         <Card>
           <h2 className="text-xl mb-4">Notes</h2>
           <RecipeSection id="notes" textValue={recipe.notes ?? ""} onBlur={val => handleUpdateRecipe({notes: val})} />
@@ -104,6 +107,7 @@ const RecipePage = (): ReactElement => {
       <ConfirmModal isOpen={showDelete} onClose={toggleDelete} title="Delete Recipe" handleConfirm={handleDelete}>
         <div>Are you sure you want to delete this recipe? This cannot be undone</div>
       </ConfirmModal>
+      <RecipeLinkModal isOpen={linkModal} onClose={toggleLinkModal} />
     </div>
   );
 };

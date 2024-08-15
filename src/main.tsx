@@ -16,8 +16,8 @@ const Main = (): ReactElement => (
     <FolderContextProvider>
       <DashboardContextProvider>
         <Routes>
-          <Route path="/:recipeId?" element={<DashboardPage />}/>
-          <Route path="/recipe" element={<RecipeContextProvider><RecipePage /> </RecipeContextProvider>} />
+          <Route index path="/" element={<DashboardPage />}/>
+          <Route path="/recipe/:recipeId?" element={<RecipeContextProvider><RecipePage /> </RecipeContextProvider>} />
         </Routes>
       </DashboardContextProvider>
     </FolderContextProvider>

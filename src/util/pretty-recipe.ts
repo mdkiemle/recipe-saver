@@ -50,6 +50,7 @@ export const prettyRecipe = (tableReturn: RawReturn[], timers: Timer[]): Recipe 
     ingredientGroups: ingGroups,
     timers,
     totalTime: tableReturn[0].totalTime || 0,
+    recipeLinks: [],
   };
   return recipe;
 };

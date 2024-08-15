@@ -2,7 +2,7 @@ import {ipcMain} from "electron";
 import {database} from "../index";
 import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
-import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn, Folder} from "../models/recipe";
+import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn, Folder, RecipeLink, AddRecipeLinkVars} from "../models/recipe";
 import { returnValues } from "../util/sql-returning";
 import { RecipeReturn } from "../views/dashboard";
 import { addQueryBuilder } from "../util/add-query-builder";
@@ -21,6 +21,20 @@ export const recipeQuery = (id: number): string => `
 
 export const timerQuery = (id: number): string => `
   select id, name, minTime, maxTime, measurement from timer where recipeId = ${id};
+`;
+
+export const recipeToRecipe = (id: number): string => `
+  select r2.id as id, r2.name as name, label from recipeToRecipe rtr
+  left join recipe r1 on r1.id = rtr.recipeParentId
+  left join recipe r2 on r2.id = rtr.recipeChildId
+  where rtr.recipeParentId = ${id};
+`;
+
+export const recipeLinkFromIds = (parentId: number, childId: number) => `
+  select r2.id as id, r2.name as name, label from recipeToRecipe rtr
+  left join recipe r1 on r1.id = rtr.recipeParentId
+  left join recipe r2 on r2.id = rtr.recipeChildId
+  where rtr.recipeParentId = ${parentId} AND rtr.recipeChildId = ${childId};
 `
 
 /**
@@ -49,11 +63,30 @@ ipcMain.on("get-recipe", (event, arg: number) => {
   const sql = recipeQuery(arg);
   database.all(sql, (err: Error, rows: RawReturn[]) => {
     if (err) return event.reply("recipe-retrieved", err.message);
-    // const recipe = prettyRecipe(rows);
     database.all(timerQuery(arg),(err, timers: Timer[]) => {
       if (err) return event.reply("recipe-retrieved", err.message);
       const recipe = prettyRecipe(rows, timers);
       event.reply("recipe-retrieved", recipe);
+    });
+  });
+});
+
+ipcMain.on("get-recipe-links", (event, arg: number) => {
+  const sql = recipeToRecipe(arg);
+  database.all(sql, (err: Error, rows: RecipeLink[]) => {
+    event.reply("get-recipe-links-return", (err && err.message) || rows)    
+  });
+});
+
+ipcMain.on("create-recipe-link", (event, {recipeChildId, recipeParentId, label}: AddRecipeLinkVars) => {
+  const sql = `
+    insert into recipeToRecipe (recipeParentId, recipeChildId, label)
+    values (${recipeParentId}, ${recipeChildId}, "${label}");
+  `;
+  database.exec(sql, err => {
+    if (err && err.message) return event.reply("create-recipe-link-return", err.message);
+    database.get(recipeLinkFromIds(recipeParentId, recipeChildId), (err, row: RecipeLink) => {
+      event.reply("create-recipe-link-return", (err && err.message) || row);
     });
   });
 });
@@ -127,6 +160,40 @@ ipcMain.on("update-folder", (event, {id, name}: Folder) => {
   database.get(sql, (err, row) => {
     event.reply("update-folder-return", (err && err.message) || row);
   });
+});
+
+ipcMain.on("copyGroupsWithIngs", (event, arg: {parentId: number, childId: number}) => {
+  const getGroups = `
+    select id from ingredientGroup where recipeId = ${arg.childId}
+  `;
+  const copy = `
+    insert into ingredientGroup (groupName, recipeId)
+    select groupName, "${arg.parentId}" from ingredientGroup where recipeId = ${arg.childId}
+    returning id, groupName;
+  `;
+  // Need to do a few things in order so best to serialize it
+  database.serialize(() => {
+    const originalGroupIds: number[] = [];
+    const copiedGroups = [];
+    // We'll need these when copying over.
+    database.each(getGroups, (err, row: {id: number}) => {
+      if (err && err.message) return event.reply("copyGroupsWithIngs-return", err.message);
+      originalGroupIds.push(row.id);
+    });
+    // Copy original ingredient groups into our current recipe
+    database.all(copy, (err, rows: {id: number, groupName: string}[]) => {
+      event.reply("copyGroupsWithIngs-return", (err && err.message) || rows);
+    });
+    // originalGroupIds.forEach(id => {
+    //   database.
+    // })
+  });
+  // database.serialize(() => {
+  //   database.all(getGroups, (err: Error, rows: {id: number}[]) => {
+  //     if (err && err.message) return event.reply("copy-ing-return", err.message);
+
+  //   });
+  // });
 });
 
 ipcMain.on("update-ingredient", (event, {id, updates}: IngredientUpdates) => {

@@ -5,8 +5,10 @@ import { Card } from "./Card";
 import { Button } from "@headlessui/react";
 import { FaLink } from "react-icons/fa";
 import { useMount } from "../hooks/useMount";
-import { RecipeLink } from "../models/recipe";
+import { DeleteLinkVars, RecipeLink } from "../models/recipe";
 import { Link } from "react-router-dom";
+import React from "react";
+import { PiTrash } from "react-icons/pi";
 
 export interface RecipeLinksProps {
   openModal: () => void;
@@ -27,6 +29,13 @@ const RecipeLinks = ({openModal}: RecipeLinksProps): ReactElement | undefined =>
     }).catch(err => console.log("Error returning links: ", err));
   });
 
+  const handleDelete = (recipeChildId: number): void => {
+    getRequest<number, DeleteLinkVars>("delete-recipe-link", "delete-recipe-link-return", {recipeParentId: id, recipeChildId})
+    .then(res => {
+      dispatch({type: "DELETE_LINK", payload: res});
+    })
+  };
+
   useEffect(() => {
     if (!isEditing && !loading && recipeLinks.length === 0) setShowing(false);
   }, [isEditing, loading]);
@@ -45,10 +54,13 @@ const RecipeLinks = ({openModal}: RecipeLinksProps): ReactElement | undefined =>
     return (
     <Card>
       <h2 className="text-xl mb-4">Recipe Links</h2>
-      <div className="flex flex-col gap-2">
-        {recipeLinks.map(link => link.label ?
+      <div className="flex flex-col gap-2 mb-4">
+        {recipeLinks.map(link => <div key={link.id} className="flex items-center gap-2">{link.label ?
           <span className="w-auto" key={link.id}>{link.label}: <Link to={`/recipe/${link.id}`} className="link">{link.name}</Link></span>
-          : <Link key={link.id} to={`/recipe/${link.id}`} className="link w-auto">{link.name}</Link>)}
+          : <Link key={link.id} to={`/recipe/${link.id}`} className="link w-auto">{link.name}</Link>}
+          {isEditing && <PiTrash onClick={() => handleDelete(link.id)} className="fill-red-500 cursor-pointer" />}
+          </div>
+        )}
       </div>
       {isEditing && <Button className="btn-primary" onClick={openModal}><FaLink /> Add Recipe Link</Button>}
     </Card>

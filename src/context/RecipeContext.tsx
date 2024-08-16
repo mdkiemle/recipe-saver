@@ -1,5 +1,5 @@
 import {PropsWithChildren, ReactElement, act, createContext, useEffect, useMemo, useReducer, useState} from "react";
-import {AddIngredientReturn, DeleteGroupReturn, DeleteIngredientReturn, DeleteTimerReturn, Folder, RawIngredientGroup, Recipe, RecipeLink, RecipeUpdateReturn, Timer} from "../models/recipe";
+import {AddIngredientReturn, DeleteGroupReturn, DeleteIngredientReturn, DeleteTimerReturn, Folder, IngredientGroup, RawIngredientGroup, Recipe, RecipeLink, RecipeUpdateReturn, Timer} from "../models/recipe";
 import { updateObject } from "../util/update-object";
 import { Setter } from "../models/setter" ;
 import {useParams} from "react-router";
@@ -33,13 +33,15 @@ export interface BaseRecipeContext {
 export type Action =
   {type: "UPDATE_RECIPE", payload: RecipeUpdateReturn} |
   {type: "UPDATE_GROUPNAME" | "ADD_ING_GROUP", payload: RawIngredientGroup} |
+  {type: "COPY_GROUPS", payload: IngredientGroup[]} |
   {type: "ADD_INGREDIENT" | "UPDATE_INGREDIENT", payload: AddIngredientReturn} |
   {type: "DELETE_INGREDIENT", payload: DeleteIngredientReturn} |
   {type: "DELETE_GROUP", payload: DeleteGroupReturn} |
   {type: "DELETE_TIMER", payload: DeleteTimerReturn} |
   {type: "ADD_TIMER" | "UPDATE_TIMER", payload: Timer} |
   {type: "ADD_LINKS", payload: RecipeLink[]} | // Mostly for querying update
-  {type: "UPDATE_LINK" | "ADD_LINK", payload: RecipeLink};
+  {type: "UPDATE_LINK" | "ADD_LINK", payload: RecipeLink} |
+  {type: "DELETE_LINK", payload: number};
 
 const RecipeContext = createContext<BaseRecipeContext>({
   recipe: baseRecipe,
@@ -74,6 +76,10 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
     case "ADD_ING_GROUP":
       return updateObject(state, {
         ingredientGroups: [...state.ingredientGroups, {...action.payload, ingredients: []}]
+      });
+    case "COPY_GROUPS":
+      return updateObject(state, {
+        ingredientGroups: [...state.ingredientGroups, ...action.payload],
       });
     case "ADD_TIMER": {
       return updateObject(state, {
@@ -139,6 +145,14 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       copyTimer.splice(idx, 1);
       return updateObject(state, {
         timers: copyTimer,
+      });
+    }
+    case "DELETE_LINK": {
+      const copyLinks = [...state.recipeLinks];
+      const idx = copyLinks.findIndex(link => link.id === action.payload);
+      copyLinks.splice(idx, 1);
+      return updateObject(state, {
+        recipeLinks: copyLinks,
       });
     }
     case "ADD_LINKS":

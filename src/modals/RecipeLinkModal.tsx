@@ -7,7 +7,7 @@ import { IdName } from "../models/generic";
 import { FilterSelect } from "../components/FilterSelect";
 import { TextInput } from "../components/text-input";
 import { RecipeContext } from "../context/RecipeContext";
-import { AddRecipeLinkVars, RecipeLink } from "../models/recipe";
+import { AddRecipeLinkVars, IngredientGroup, RecipeLink } from "../models/recipe";
 import { FaCheck } from "react-icons/fa";
 
 export type RecipeLinkModalProps = Omit<ModalProps, "title" | "children">
@@ -23,10 +23,9 @@ const RecipeLinkModal = ({isOpen, onClose}: RecipeLinkModalProps): ReactElement 
 
 
   const handleImportIngGroups = (parentId: number, childId: number): void => {
-    console.log("oh god oh fuck oh god");
-    getRequest("copyGroupsWithIngs", "copyGroupsWithIngs-return", {parentId, childId})
+    getRequest<IngredientGroup[], {parentId: number, childId: number}>("copyGroupsWithIngs", "copyGroupsWithIngs-return", {parentId, childId})
     .then(res => {
-      console.log("response from copy", res);
+      dispatch({type: "COPY_GROUPS", payload: res})
       onClose();
     });
   };
@@ -60,14 +59,16 @@ const RecipeLinkModal = ({isOpen, onClose}: RecipeLinkModalProps): ReactElement 
       : <div className="flex gap-2 flex-col">
         <FilterSelect options={recipes} selected={selected} setSelected={setSelected} />
         <TextInput value={label} onChange={setLabel} id="recipe-link-label-input" label="Label (optional)"/>
-        <Checkbox
-          checked={copyIngs} 
-          onChange={setCopyIngs}
-          className="group size-6 rounded-md bg-white/10 p-1 ring-1 ring-white/15 ring-inset data-[checked]:bg-white"
-        >
-          <FaCheck className="hidden size-4 fill-black group-data-[checked]:block"/>
-        </Checkbox>
-        <span>hey</span>
+        <div className="flex gap-2">
+          <Checkbox
+            checked={copyIngs} 
+            onChange={setCopyIngs}
+            className="cursor-pointer group size-6 rounded-md bg-white p-1 ring-1 ring-white/15 ring-inset data-[checked]:bg-white"
+          >
+            <FaCheck className="hidden size-4 fill-black group-data-[checked]:block"/>
+          </Checkbox>
+          <span>Copy ingredients over</span>
+        </div>
       </div>}
       <div className="mt-4 flex justify-end gap-2">
         <Button className="btn-secondary" onClick={onClose}>Cancel</Button>

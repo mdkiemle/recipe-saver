@@ -150,6 +150,11 @@ export interface TimerUpdateVars {
   measurement?: TimerMeasure;
 }
 
+export interface DeleteLinkVars {
+  recipeParentId: number;
+  recipeChildId: number;
+}
+
 export type DeleteTimerReturn = Pick<Timer, "id">;
 
 export type DeleteIngredientReturn = Pick<AddIngredientReturn, "id" | "ingredientGroupId">;

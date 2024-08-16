@@ -2,7 +2,7 @@ import {ipcMain} from "electron";
 import {database} from "../index";
 import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
-import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn, Folder, RecipeLink, AddRecipeLinkVars, Ingredient, IngredientGroup} from "../models/recipe";
+import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn, Folder, RecipeLink, AddRecipeLinkVars, Ingredient, IngredientGroup, DeleteLinkVars} from "../models/recipe";
 import { returnValues } from "../util/sql-returning";
 import { RecipeReturn } from "../views/dashboard";
 import { addQueryBuilder } from "../util/add-query-builder";
@@ -174,9 +174,6 @@ ipcMain.on("copyGroupsWithIngs", (event, arg: {parentId: number, childId: number
   // Need to do a few things in order so best to serialize it
   database.serialize(() => {
     const originalGroupIds: number[] = [];
-    const copiedGroups = [];
-    const copiedIngs = [];
-    // We'll need these when copying over.
     database.each(getGroups, (err, row: {id: number}) => {
       if (err && err.message) return event.reply("copyGroupsWithIngs-return", err.message);
       originalGroupIds.push(row.id);
@@ -187,30 +184,21 @@ ipcMain.on("copyGroupsWithIngs", (event, arg: {parentId: number, childId: number
       // event.reply("copyGroupsWithIngs-return", (err && err.message) || rows);
       const copiedGroups: IngredientGroup[] = rows.map(row => ({...row, ingredients: []}));
       originalGroupIds.forEach((id, idx) => {
-        database.each(`
+        database.all(`
           insert into ingredient (item, measurement, ingredientGroupId)
           select item, measurement, "${copiedGroups[idx].id}" from ingredient where ingredientGroupId = ${id}
-          returning *;
-        `, (err, row: Ingredient & {ingredientGroupId: number}) => {
-          console.log("what?", err, "ing", row);
+          returning id, item, measurement;
+        `, (err, rows: (Ingredient & {ingredientGroupId: number})[]) => {
           if (err && err.message) return event.reply("copyGroupsWithIngs-return", err.message);
-          copiedGroups[idx].ingredients.push(row);
+          copiedGroups[idx].ingredients.push(...rows);
+          if (idx === originalGroupIds.length - 1 ) {
+            event.reply("copyGroupsWithIngs-return", copiedGroups);
+          }
         });
       });
-      console.log("copiedGroups", copiedGroups);
-      event.reply("copyGroupsWithIngs-return", copiedGroups);
     });
   });
-    // originalGroupIds.forEach(id => {
-    //   database.
-    // })
 });
-  // database.serialize(() => {
-  //   database.all(getGroups, (err: Error, rows: {id: number}[]) => {
-  //     if (err && err.message) return event.reply("copy-ing-return", err.message);
-
-  //   });
-  // });
 
 ipcMain.on("update-ingredient", (event, {id, updates}: IngredientUpdates) => {
   const setQuery = setQueryBuilder(updates);
@@ -305,6 +293,17 @@ ipcMain.on("delete-ingredientGroup", (event, id: number) => {
   `;
   database.get(deleteSql, (err, row: DeleteGroupReturn) => {
     event.reply("delete-ingredientGroup-return", (err && err.message) || row);
+  });
+});
+
+ipcMain.on("delete-recipe-link", (event, {recipeParentId, recipeChildId}: DeleteLinkVars) => {
+  const deleteSql = `
+    delete from recipeToRecipe
+    where recipeParentId = ${recipeParentId} and recipeChildId = ${recipeChildId}
+    returning recipeChildId;
+  `;
+  database.get(deleteSql, (err, row: {recipeChildId: number}) => {
+    event.reply("delete-recipe-link-return", (err && err.message) || row.recipeChildId);
   });
 });
 

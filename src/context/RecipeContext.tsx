@@ -37,7 +37,7 @@ export type Action =
   {type: "ADD_INGREDIENT" | "UPDATE_INGREDIENT", payload: AddIngredientReturn} |
   {type: "DELETE_INGREDIENT", payload: DeleteIngredientReturn} |
   {type: "DELETE_GROUP", payload: DeleteGroupReturn} |
-  {type: "DELETE_TIMER", payload: DeleteTimerReturn} |
+  {type: "DELETE_TIMER", payload: number} |
   {type: "ADD_TIMER" | "UPDATE_TIMER", payload: Timer} |
   {type: "ADD_LINKS", payload: RecipeLink[]} | // Mostly for querying update
   {type: "UPDATE_LINK" | "ADD_LINK", payload: RecipeLink} |
@@ -141,7 +141,7 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
     }
     case "DELETE_TIMER": {
       const copyTimer = [...state.timers];
-      const idx = copyTimer.findIndex(timer => timer.id = action.payload.id);
+      const idx = copyTimer.findIndex(timer => timer.id === action.payload);
       copyTimer.splice(idx, 1);
       return updateObject(state, {
         timers: copyTimer,
@@ -154,7 +154,7 @@ const recipeReducer = (state: Recipe, action: Action): Recipe => {
       return updateObject(state, {
         recipeLinks: copyLinks,
       });
-    }
+    }4
     case "ADD_LINKS":
       return updateObject(state, {
         recipeLinks: [...state.recipeLinks, ...action.payload],
@@ -179,7 +179,6 @@ const RecipeContextProvider = (props: PropsWithChildren): ReactElement => {
     if (!recipeId) return;
     setLoading(true);
     getRequest<Recipe, string>("get-recipe", "recipe-retrieved", recipeId).then(res => {
-      // setRecipe(res);
       dispatch({type: "UPDATE_RECIPE", payload: res});
       setLoading(false);
     }).catch(err => {

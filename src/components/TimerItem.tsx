@@ -37,7 +37,7 @@ const TimerItem = ({timer}: TimerProps): ReactElement => {
   };
 
   const handleDelete = (): void => {
-    getRequest<DeleteTimerReturn, number>("delete-timer", "delete-timer-return", timer.id)
+    getRequest<number, number>("delete-timer", "delete-timer-return", timer.id)
     .then(res => {
       dispatch({type: "DELETE_TIMER", payload: res});
       // Kind of want to do this a different way but I guess it's fine.

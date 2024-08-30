@@ -13,6 +13,7 @@ import {useNavigate} from "react-router";
 import { TimerSection } from "../../components/TimerSection";
 import {AiOutlineGroup} from "react-icons/ai"
 import { RecipeLinks } from "../../components/RecipeLinks";
+import { PiPrinter } from "react-icons/pi";
 
 const RecipePage = (): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
@@ -43,7 +44,7 @@ const RecipePage = (): ReactElement => {
   const handleSetEditing = (checked: boolean): void => {
     setIsEditing(checked);
     setAutoFocus(false);
-  }
+  };
 
   const handleDelete = (): void => {
     getRequest<number, number>("delete-recipe", "delete-recipe-return", recipe.id)
@@ -52,7 +53,9 @@ const RecipePage = (): ReactElement => {
     }).catch(err => {
       console.log("Uh oh: ", err);
     });
-  }
+  };
+
+  const handlePrint = (): void => nav(`/print/${recipe.id}`);
 
   return (
     <div className="container flex flex-col gap-4 m-auto">
@@ -108,6 +111,7 @@ const RecipePage = (): ReactElement => {
         <div>Are you sure you want to delete this recipe? This cannot be undone</div>
       </ConfirmModal>
       <RecipeLinkModal isOpen={linkModal} onClose={toggleLinkModal} />
+      <PiPrinter className="w-6 h-6" onClick={handlePrint}/>
     </div>
   );
 };

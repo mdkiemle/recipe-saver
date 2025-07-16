@@ -1,7 +1,7 @@
 import {ReactElement, useContext} from "react";
 import { RecipeContext } from "../context/RecipeContext";
 import { Pill } from "./Pill";
-import {PiFolderFill, PiX } from "react-icons/pi";
+import {PiFolderFill, PiPrinter, PiX } from "react-icons/pi";
 import { FaChevronLeft, FaHome } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import { AddToFolder } from "./AddToFolder";
@@ -32,9 +32,11 @@ const FolderSection = (): ReactElement => {
     nav("/");
   };
 
+  const handlePrint = (): void => nav(`/print/${recipeId}`);
+
   return (
     <div className="container flex flex-wrap gap-2">
-      <FaChevronLeft className="size-5 cursor-pointer self-center" onClick={() => nav(-1)}/>
+			<FaChevronLeft className="size-5 cursor-pointer self-center" onClick={() => nav(-1)}/>  
       <FaHome className="size-5 cursor-pointer self-center" onClick={handleHome}/>
       <div className="flex flex-1 gap-2 flex-wrap">
         {folders.length > 0 && folders.map(f =>
@@ -43,6 +45,7 @@ const FolderSection = (): ReactElement => {
           </Pill>
         )}
       </div>
+      <PiPrinter className="w-6 h-6 self-center cursor-pointer" onClick={handlePrint}/>
       <AddToFolder />
     </div>
   );

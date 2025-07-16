@@ -13,7 +13,6 @@ import {useNavigate} from "react-router";
 import { TimerSection } from "../../components/TimerSection";
 import {AiOutlineGroup} from "react-icons/ai"
 import { RecipeLinks } from "../../components/RecipeLinks";
-import { PiPrinter } from "react-icons/pi";
 
 const RecipePage = (): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
@@ -111,7 +110,6 @@ const RecipePage = (): ReactElement => {
         <div>Are you sure you want to delete this recipe? This cannot be undone</div>
       </ConfirmModal>
       <RecipeLinkModal isOpen={linkModal} onClose={toggleLinkModal} />
-      <PiPrinter className="w-6 h-6" onClick={handlePrint}/>
     </div>
   );
 };

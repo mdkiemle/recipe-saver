@@ -26,6 +26,7 @@ const RecipeLinkModal = ({isOpen, onClose}: RecipeLinkModalProps): ReactElement 
     getRequest<IngredientGroup[], {parentId: number, childId: number}>("copyGroupsWithIngs", "copyGroupsWithIngs-return", {parentId, childId})
     .then(res => {
       dispatch({type: "COPY_GROUPS", payload: res})
+      setCreating(false);
       onClose();
     });
   };

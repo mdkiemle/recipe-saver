@@ -1,6 +1,4 @@
 import {ipcRenderer} from "electron";
-import { RecipeReturn } from "../views/dashboard";
-import { IdName } from "../models/generic";
 
 export const send = (reqName: string, message: string): Promise<any> => {
   return new Promise((resolve => {
@@ -23,3 +21,7 @@ export const getRequest = <T, K>(reqName: string, resName: string, input: K): Pr
     ipcRenderer.send(reqName, input)
   });
 };
+
+export const printPrevew = (url: string) => {
+  ipcRenderer.send("previewComponent", url);
+}

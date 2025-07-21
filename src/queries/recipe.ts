@@ -4,7 +4,7 @@ import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
 import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn, Folder, RecipeLink, AddRecipeLinkVars, Ingredient, IngredientGroup, DeleteLinkVars, DeleteTimerReturn} from "../models/recipe";
 import { returnValues } from "../util/sql-returning";
-import { RecipeReturn } from "../views/dashboard";
+import { RecipeReturn } from "../types";
 import { addQueryBuilder } from "../util/add-query-builder";
 
 
@@ -54,7 +54,7 @@ ipcMain.on("get-recipes", (event) => {
 
 ipcMain.on("get-recipes-no-folder", (event) => {
   const sql = "select id, name, description from recipe r left join folderRecipe fr on fr.recipeId = r.id where fr.recipeId is null"
-  database.all(sql, (err, rows) => {
+  database.all(sql, (err: { message: any; }, rows: any) => {
     event.reply("get-recipes-no-folder-return", (err && err.message) || rows);
   });
 });
@@ -63,7 +63,7 @@ ipcMain.on("get-recipe", (event, arg: number) => {
   const sql = recipeQuery(arg);
   database.all(sql, (err: Error, rows: RawReturn[]) => {
     if (err) return event.reply("recipe-retrieved", err.message);
-    database.all(timerQuery(arg),(err, timers: Timer[]) => {
+    database.all(timerQuery(arg),(err: { message: any; }, timers: Timer[]) => {
       if (err) return event.reply("recipe-retrieved", err.message);
       const recipe = prettyRecipe(rows, timers);
       event.reply("recipe-retrieved", recipe);
@@ -83,9 +83,9 @@ ipcMain.on("create-recipe-link", (event, {recipeChildId, recipeParentId, label}:
     insert into recipeToRecipe (recipeParentId, recipeChildId, label)
     values (${recipeParentId}, ${recipeChildId}, "${label}");
   `;
-  database.exec(sql, err => {
+  database.exec(sql, (err: { message: any; }) => {
     if (err && err.message) return event.reply("create-recipe-link-return", err.message);
-    database.get(recipeLinkFromIds(recipeParentId, recipeChildId), (err, row: RecipeLink) => {
+    database.get(recipeLinkFromIds(recipeParentId, recipeChildId), (err: { message: any; }, row: RecipeLink) => {
       event.reply("create-recipe-link-return", (err && err.message) || row);
     });
   });
@@ -101,7 +101,7 @@ ipcMain.on("update-recipe", (event, {id, updates}: RecipeUpdates) => {
     where id = ${id}
     returning id, ${returning};
   `;
-  database.get(sql, (err, row) => {
+  database.get(sql, (err: { message: any; }, row: any) => {
     event.reply("update-recipe-return", (err && err.message) || row);
   });
 });
@@ -117,7 +117,7 @@ ipcMain.on("update-totalTime", (event, id: number) => {
     where id = ${id}
     returning id, totalTime;
   `;
-  database.get(sql, (err, row) => {
+  database.get(sql, (err: { message: any; }, row: any) => {
     event.reply("update-totalTime-return", (err && err.message) || row);
   });
 });
@@ -129,7 +129,7 @@ ipcMain.on("add-timer", (event, newTimer: AddTimerVars) => {
     values (${values})
     returning id, name, minTime, maxTime, measurement;
   `;
-  database.get(sql, (err, row) => {
+  database.get(sql, (err: { message: any; }, row: any) => {
     event.reply("add-timer-return", (err && err.message) || row);
   });
 });
@@ -145,7 +145,7 @@ ipcMain.on("update-timer", (event, {id, updates}: TimerUpdates) => {
     returning id, ${returning};
   `;
 
-  database.get(sql, (err, row) => {
+  database.get(sql, (err: { message: any; }, row: any) => {
     event.reply("update-timer-return", (err && err.message) || row);
   });
 });
@@ -179,7 +179,7 @@ ipcMain.on("copyGroupsWithIngs", (event, arg: {parentId: number, childId: number
       originalGroupIds.push(row.id);
     });
     // Copy original ingredient groups into our current recipe
-    database.all(copy, (err, rows: {id: number, groupName: string}[]) => {
+    database.all(copy, (err, rows: IngredientGroup[]) => {
       if (err && err.message) return event.reply("copyGroupsWithIngs-return", err.message);
       // event.reply("copyGroupsWithIngs-return", (err && err.message) || rows);
       const copiedGroups: IngredientGroup[] = rows.map(row => ({...row, ingredients: []}));
@@ -188,7 +188,7 @@ ipcMain.on("copyGroupsWithIngs", (event, arg: {parentId: number, childId: number
           insert into ingredient (item, measurement, ingredientGroupId)
           select item, measurement, "${copiedGroups[idx].id}" from ingredient where ingredientGroupId = ${id}
           returning id, item, measurement;
-        `, (err, rows: (Ingredient & {ingredientGroupId: number})[]) => {
+        `, (err: { message: any; }, rows: (Ingredient & {ingredientGroupId: number})[]) => {
           if (err && err.message) return event.reply("copyGroupsWithIngs-return", err.message);
           copiedGroups[idx].ingredients.push(...rows);
           if (idx === originalGroupIds.length - 1 ) {
@@ -210,20 +210,20 @@ ipcMain.on("update-ingredient", (event, {id, updates}: IngredientUpdates) => {
     where id = ${id}
     returning id, ingredientGroupId, ${returning};
   `;
-  database.get(sql, (err: Error, row) => {
+  database.get(sql, (err: Error, row: any) => {
     event.reply("update-ingredient-return", (err && err.message) || row);
   });
 });
 
 ipcMain.on("create-recipe", (event, {name, folderId}: {name: string, folderId: number}) => {
   const createSql = `insert into recipe (name) values ("${name}") returning id, name;`
-  database.get(createSql, (err, row: {id: number, name: string}) => {
+  database.get(createSql, (err: { message: any; }, row: {id: number, name: string}) => {
     if (err) return event.reply("create-error", err?.message);
     if (folderId !== 0) {
       database.exec(`
         insert into folderRecipe (recipeId, folderId)
         values (${row.id}, ${folderId});
-      `, err => console.log("err?", err));
+      `, (err: any) => console.log("err?", err));
     }
     event.reply("create-recipe-return", (err && err.message) || row);
   });
@@ -236,7 +236,7 @@ ipcMain.on("update-groupName", (event, {id, text}: RecipeTextUpdate) => {
     where id = ${id}
     returning id, groupName;
   `;
-  database.get(updateSql, (err, row) => {
+  database.get(updateSql, (err: { message: any; }, row: any) => {
     event.reply("update-groupName-return", (err && err.message) || row);
   });
 });
@@ -247,7 +247,7 @@ ipcMain.on("add-ingGroup", (event, {recipeId, groupName}: AddIngredientGroup) =>
     values ("${groupName}", ${recipeId})
     returning groupName, id;
   `;
-  database.get(updateSql, (err, row) => {
+  database.get(updateSql, (err: { message: any; }, row: any) => {
     event.reply("add-ingGroup-return", (err && err.message) || row);
   });
 });
@@ -258,7 +258,7 @@ ipcMain.on("add-ingredient", (event, {ingredientGroupId, item, measurement}: Add
     values ("${item}", "${measurement}", ${ingredientGroupId})
     returning *;
   `;
-  database.get(addSql, (err, row) => {
+  database.get(addSql, (err: { message: any; }, row: any) => {
     event.reply("add-ingredient-return", (err && err.message) || row);
   });
 });
@@ -269,7 +269,7 @@ ipcMain.on("delete-recipe", (event, id: number) => {
     where id = ${id}
     returning id;
   `;
-  database.get(deleteSql, (err, row) => {
+  database.get(deleteSql, (err: { message: any; }, row: any) => {
     event.reply("delete-recipe-return", (err && err.message) || row);
   });
 });
@@ -280,7 +280,7 @@ ipcMain.on("delete-ingredient", (event, id: number) => {
     where id = ${id}
     returning id, ingredientGroupId;
   `;
-  database.get(deleteSql, (err, row: DeleteIngredientReturn) => {
+  database.get(deleteSql, (err: { message: any; }, row: DeleteIngredientReturn) => {
     event.reply("delete-ingredient-return", (err && err.message) || row);
   });
 });
@@ -291,7 +291,7 @@ ipcMain.on("delete-ingredientGroup", (event, id: number) => {
     where id = ${id}
     returning id;
   `;
-  database.get(deleteSql, (err, row: DeleteGroupReturn) => {
+  database.get(deleteSql, (err: { message: any; }, row: DeleteGroupReturn) => {
     event.reply("delete-ingredientGroup-return", (err && err.message) || row);
   });
 });
@@ -302,7 +302,7 @@ ipcMain.on("delete-recipe-link", (event, {recipeParentId, recipeChildId}: Delete
     where recipeParentId = ${recipeParentId} and recipeChildId = ${recipeChildId}
     returning recipeChildId;
   `;
-  database.get(deleteSql, (err, row: {recipeChildId: number}) => {
+  database.get(deleteSql, (err: { message: any; }, row: {recipeChildId: number}) => {
     event.reply("delete-recipe-link-return", (err && err.message) || row.recipeChildId);
   });
 });
@@ -312,7 +312,7 @@ ipcMain.on("delete-timer", (event, id: number) => {
     delete from timer where id = ${id}
     returning id;
   `;
-  database.get(sql, (err, row: DeleteTimerReturn) => {
+  database.get(sql, (err: { message: any; }, row: DeleteTimerReturn) => {
     event.reply("delete-timer-return", (err && err.message) || row.id);
   });
 });

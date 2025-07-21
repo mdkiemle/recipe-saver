@@ -1,6 +1,6 @@
 import {ipcMain} from "electron";
 import {database} from "../index";
-import { RecipeReturn } from "../views/dashboard";
+import { RecipeReturn } from "../types";
 import { IdName } from "../models/generic";
 
 ipcMain.on("get-all-folders", (event, arg) => {

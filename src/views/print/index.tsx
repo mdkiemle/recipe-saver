@@ -8,6 +8,7 @@ import { TbColumns1 } from "react-icons/tb";
 import { Button } from "@headlessui/react";
 import { useReactToPrint } from "react-to-print/lib";
 import { printPrevew } from "../../messaging/send";
+import {clsx} from "clsx";
 
 enum PageView {
   Column,
@@ -69,14 +70,15 @@ const PrintPage = (): ReactElement => {
     <div className="container flex flex-col">
       <nav className="container flex flex-row gap-2 pb-4">
         <FaChevronLeft className="size-5 cursor-pointer self-center" onClick={handleBack}/>
-        <FaColumns className="size-5 cursor-pointer self-center" onClick={() => changeCurrentView(PageView.Columns)}/>
-        <TbColumns1 className="size-5 cursor-pointer self-center" onClick={() => changeCurrentView(PageView.Column)}/>
+        <FaColumns className={clsx("size-5 cursor-pointer self-center hover:fill-purple-400", currentView == PageView.Columns && "fill-purple-600")} onClick={() => changeCurrentView(PageView.Columns)}/>
+        <TbColumns1 className={clsx("size-5 cursor-pointer self-center hover:stroke-purple-400", currentView == PageView.Column && "stroke-purple-600")}  onClick={() => changeCurrentView(PageView.Column)}/>
+        <Button className="btn-primary ml-auto" onClick={printFunction}>Print</Button>
       </nav>
       <div className="container" ref={printDivRef}>
         {/* {chooseView()}  We can use this if we get more than two views.*/}
         {currentView == PageView.Column ? <PrintColumnView recipe={recipe} /> : <PrintTwoColumnView recipe={recipe} /> }
       </div>
-      <Button className="btn-primary" onClick={printFunction}>Print</Button>
+      
     </div>
   );
 };

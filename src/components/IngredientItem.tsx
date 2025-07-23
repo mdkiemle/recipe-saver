@@ -4,6 +4,7 @@ import { ToggleInput } from "./ToggleInput";
 import { PiTrash } from "react-icons/pi";
 import { getRequest } from "../messaging/send";
 import { RecipeContext } from "../context/RecipeContext";
+import { unescape } from "validator";
 
 export interface IngredientItemProps {
   ingredient: Ingredient
@@ -30,7 +31,7 @@ const IngredientItem = ({ingredient, isEditing}: IngredientItemProps): ReactElem
       <ToggleInput
         id={`${ingredient.id}-measurement`}
         isEditing={isEditing}
-        value={ingredient.measurement}
+        value={unescape(ingredient.measurement)}
         className="px-1 py-1 col-span-2"
         onBlur={val => handleIngUpdate({measurement: val})}
         autoFocus={autoFocus}
@@ -38,7 +39,7 @@ const IngredientItem = ({ingredient, isEditing}: IngredientItemProps): ReactElem
       <ToggleInput
         id={`${ingredient.id}-item`}
         isEditing={isEditing}
-        value={ingredient.item}
+        value={unescape(ingredient.item)}
         className="px-1 py-1 col-span-4"
         onBlur={val => handleIngUpdate({item: val})}
       />

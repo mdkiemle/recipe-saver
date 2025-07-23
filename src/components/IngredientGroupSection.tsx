@@ -7,6 +7,7 @@ import { Button } from "@headlessui/react";
 import {PiFlask, PiTrash} from "react-icons/pi";
 import { IngredientList } from "./IngredientList";
 import { Card } from "./Card";
+import { unescape } from "validator";
 
 export interface IngredientGroupProps {
   ingredientGroup: IngredientGroup;
@@ -45,7 +46,7 @@ const IngredientGroupSection = ({ingredientGroup: {id, ingredients, groupName}}:
     <Card className="relative">
       <ToggleInput
         id={`${id}-groupInput`}
-        value={groupName}
+        value={unescape(groupName)}
         isEditing={isEditing}
         className="text-xl col-span-5"
         onBlur={handleChangeGroup}

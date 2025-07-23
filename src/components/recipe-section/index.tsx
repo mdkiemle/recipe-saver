@@ -3,6 +3,7 @@ import {RecipeContext} from "../../context/RecipeContext";
 import {Textarea} from "@headlessui/react";
 import {clsx} from "clsx"
 import {useResizeTextarea} from "../../hooks/useResizeTextarea";
+import { escape } from "validator";
 
 export interface RecipeSectionProps {
   id: string;
@@ -17,7 +18,7 @@ const RecipeSection = ({id, textValue, onBlur}: RecipeSectionProps): ReactElemen
 
   const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>): void => {
     if (!isEditing || textValue === e.target.value) return;
-    onBlur?.(e.target.value);
+    onBlur?.(escape(e.target.value));
   };
 
   // For if the textValue updates outside of this element

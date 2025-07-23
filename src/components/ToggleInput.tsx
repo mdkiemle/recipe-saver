@@ -1,6 +1,7 @@
 import React, {ReactElement, useEffect, useMemo, useRef, useState} from "react";
 import {clsx} from "clsx";
 import { Input } from "@headlessui/react";
+import {escape} from "validator";
 
 export interface ToggleInputProps {
   id: string;
@@ -24,7 +25,7 @@ const ToggleInput = ({id, isEditing, value, onBlur, className, editingStyle, max
     if (validate && e.target.value === "") {
       return setText(value);
     }
-    onBlur?.(e.target.value);
+    onBlur?.(escape(e.target.value));
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => setText(e.target.value);

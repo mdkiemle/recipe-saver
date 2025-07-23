@@ -10,6 +10,15 @@ import {updateElectronApp} from "update-electron-app";
 // Auto updates electron app based on github
 updateElectronApp();
 
+let dev = false;
+if (
+    process.defaultApp ||
+    /[\\/]electron-prebuilt[\\/]/.test(process.execPath) ||
+    /[\\/]electron[\\/]/.test(process.execPath)
+) {
+  dev = true;
+}
+
 // I don't know
 // recipeQueries
 
@@ -47,7 +56,7 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if (dev) mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

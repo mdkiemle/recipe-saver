@@ -4,6 +4,7 @@ import "./queries/recipe";
 import "./queries/folder";
 import "./queries/search";
 import "./service/printing"
+import "./service/new-window";
 import { setup } from './util/db-setupd';
 import {updateElectronApp} from "update-electron-app";
 

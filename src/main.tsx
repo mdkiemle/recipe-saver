@@ -21,6 +21,8 @@ const Main = (): ReactElement => (
           <Route element={<RecipeContextLayout />}>
             <Route path="/recipe/:recipeId?" element={<RecipePage />} /> 
             <Route path="/print/:recipeId?" element={<PrintPage />} />
+            {/* Route for viewing only, usually opened in a new window */}
+            <Route path="/recipe/view-only/:recipeId?" element = {<RecipePage isViewOnly/>} />
           </Route>
         </Routes>
       </DashboardContextProvider>

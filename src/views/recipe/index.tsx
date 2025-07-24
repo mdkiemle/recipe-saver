@@ -15,7 +15,11 @@ import {AiOutlineGroup} from "react-icons/ai"
 import { RecipeLinks } from "../../components/RecipeLinks";
 import {unescape} from "validator";
 
-const RecipePage = (): ReactElement => {
+export interface RecipePageProps {
+  isViewOnly?: boolean;
+}
+
+const RecipePage = ({isViewOnly = false}: RecipePageProps): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
   const [showDelete, setShowDelete] = useState(false);
   const [linkModal, setLinkModal] = useState(false);
@@ -57,7 +61,7 @@ const RecipePage = (): ReactElement => {
 
   return (
     <div className="container flex flex-col gap-4 m-auto">
-      <FolderSection />
+      {!isViewOnly && <FolderSection />}
       {!loading && recipe && <>
         <Card className="container flex flex-row">
           <ToggleInput

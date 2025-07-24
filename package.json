@@ -1,7 +1,7 @@
 {
   "name": "recipe-saver-webpack",
   "productName": "recipe-saver-webpack",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "Recipe Saver",
   "main": ".webpack/main",
   "repository": {

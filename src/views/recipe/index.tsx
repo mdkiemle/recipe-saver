@@ -85,7 +85,7 @@ const RecipePage = (): ReactElement => {
         </Card>
         <Card>
           <h2 className="text-xl mb-4">Description</h2>
-          <RecipeSection id="description" textValue={unescape(recipe.description)} onBlur={val => handleUpdateRecipe({description: val})}/>
+          <RecipeSection id="description" textValue={recipe.description ? unescape(recipe.description) : ""} onBlur={val => handleUpdateRecipe({description: val})}/>
         </Card>
         <TimerSection />
         {recipe.ingredientGroups.length === 0 && <Card><h2 className="text-xl">Ingredient groups</h2></Card>}
@@ -95,12 +95,12 @@ const RecipePage = (): ReactElement => {
         </Button>}
         <Card>
           <h2 className="text-xl mb-4">Instructions</h2>
-          <RecipeSection id="instructions" textValue={unescape(recipe.instructions)} onBlur={val => handleUpdateRecipe({instructions: val})}/>
+          <RecipeSection id="instructions" textValue={recipe.instructions ? unescape(recipe.instructions) : ""} onBlur={val => handleUpdateRecipe({instructions: val})}/>
         </Card>
         <RecipeLinks openModal={toggleLinkModal}/>
         <Card>
           <h2 className="text-xl mb-4">Notes</h2>
-          <RecipeSection id="notes" textValue={unescape(recipe.notes) ?? ""} onBlur={val => handleUpdateRecipe({notes: val})} />
+          <RecipeSection id="notes" textValue={recipe.notes ? unescape(recipe.notes) : ""} onBlur={val => handleUpdateRecipe({notes: val})} />
         </Card>
         {isEditing && <Button className="btn-delete self-end" onClick={toggleDelete}>Delete</Button>}
         </>

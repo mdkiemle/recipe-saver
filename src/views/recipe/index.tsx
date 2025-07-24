@@ -55,8 +55,6 @@ const RecipePage = (): ReactElement => {
     });
   };
 
-  const handlePrint = (): void => nav(`/print/${recipe.id}`);
-
   return (
     <div className="container flex flex-col gap-4 m-auto">
       <FolderSection />

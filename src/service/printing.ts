@@ -22,8 +22,6 @@ ipcMain.on("previewComponent", async (event, url) => {
     autoHideMenuBar: true,
   });
 
-  console.log("Inside previewComponent ipcMain");
-
   win.webContents.once("did-finish-load", () => {
     win.webContents.printToPDF(printOptions).then((data) => {
       const buf = Buffer.from(data);
@@ -38,6 +36,9 @@ ipcMain.on("previewComponent", async (event, url) => {
     }).catch((error) => {
       console.log(error);
     });
+  });
+  win.on("closed", () => {
+    win = null
   });
   await win.loadURL(url);
   return "shown preview window";

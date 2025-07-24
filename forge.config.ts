@@ -44,6 +44,11 @@ const config: ForgeConfig = {
               js: './src/preload.ts',
             },
           },
+          {
+            html: "src/secondary.html",
+            js: "./src/secondary-renderer.ts",
+            name: "secondary_window",
+          }
         ],
       },
     }),

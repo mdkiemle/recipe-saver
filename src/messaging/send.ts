@@ -1,4 +1,5 @@
 import {ipcRenderer} from "electron";
+import { IdName } from "../models/generic";
 
 export const send = (reqName: string, message: string): Promise<any> => {
   return new Promise((resolve => {
@@ -24,4 +25,8 @@ export const getRequest = <T, K>(reqName: string, resName: string, input: K): Pr
 
 export const printPrevew = (url: string) => {
   ipcRenderer.send("previewComponent", url);
+}
+
+export const newWindowViewOnly = (input: IdName) => {
+  ipcRenderer.send("viewOnlyWindow", input);
 }

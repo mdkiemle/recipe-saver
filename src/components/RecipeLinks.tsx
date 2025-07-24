@@ -1,12 +1,12 @@
 import {ReactElement, useContext, useEffect, useState} from "react";
 import { RecipeContext } from "../context/RecipeContext";
-import { getRequest } from "../messaging/send";
+import { getRequest, newWindowViewOnly } from "../messaging/send";
 import { Card } from "./Card";
 import { Button } from "@headlessui/react";
 import { FaLink } from "react-icons/fa";
 import { useMount } from "../hooks/useMount";
 import { DeleteLinkVars, RecipeLink } from "../models/recipe";
-import { Link } from "react-router-dom";
+import { Link, useHref, useLocation } from "react-router-dom";
 import React from "react";
 import { PiTrash } from "react-icons/pi";
 
@@ -15,10 +15,12 @@ export interface RecipeLinksProps {
 }
 
 const RecipeLinks = ({openModal}: RecipeLinksProps): ReactElement | undefined => {
-  const {recipe: {id, recipeLinks}, isEditing, dispatch} = useContext(RecipeContext);
+  const {recipe: {id, recipeLinks, name}, isEditing, dispatch} = useContext(RecipeContext);
+  const {pathname} = useLocation();
   const [loading, setLoading] = useState(false);
   const [showing, setShowing] = useState(false);
 
+  console.log("Hey", location);
   const handleShowRecipeLink = (): void => setShowing(true);
   
   useMount(() => {
@@ -35,6 +37,13 @@ const RecipeLinks = ({openModal}: RecipeLinksProps): ReactElement | undefined =>
       dispatch({type: "DELETE_LINK", payload: res});
     })
   };
+
+  const handleViewRecipe = (): void => {
+    // var url = `${window.location.origin}/#/recipe/view-only/${id}`;
+    var url = `${window.location.origin}/#`;
+    newWindowViewOnly({id, name});
+    // window.open(window.location.origin, '_blank', 'top=500,left=200')
+  }
 
   useEffect(() => {
     if (!isEditing && !loading && recipeLinks.length === 0) setShowing(false);
@@ -56,8 +65,9 @@ const RecipeLinks = ({openModal}: RecipeLinksProps): ReactElement | undefined =>
       <h2 className="text-xl mb-4">Recipe Links</h2>
       <div className="flex flex-col gap-2 mb-4">
         {recipeLinks.map(link => <div key={link.id} className="flex items-center gap-2">{link.label ?
-          <span className="w-auto" key={link.id}>{link.label}: <Link to={`/recipe/${link.id}`} className="link">{link.name}</Link></span>
-          : <Link key={link.id} to={`/recipe/${link.id}`} className="link w-auto">{link.name}</Link>}
+          <span className="w-auto" key={link.id}>{link.label}: <span className="font-semibold">{link.name}</span></span>
+          : <span key={link.id} className="font-semibold w-auto">{link.name}</span>}
+          <Button className="btn-secondary" onClick={handleViewRecipe}>View Recipe</Button>
           {isEditing && <PiTrash onClick={() => handleDelete(link.id)} className="fill-red-500 cursor-pointer" />}
           </div>
         )}

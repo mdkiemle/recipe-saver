@@ -16,7 +16,7 @@ const RecipeCard = ({recipe: r}: RecipeCardProps): ReactElement => (
   <Card>
     <Link key={r.id} to={`recipe/${r.id}`} state={r.id} className="link text-lg">{r.name}</Link>
     {r.ingredients?.length && <div className="container flex flex-col">
-      <span className="text-green-500">Matches:</span>
+      <span className="text-green-500">Matches ({r.ingredients.length}):</span>
       {r.ingredients?.map(i => <span key={i.id}>{unescape(i.measurement)} {unescape(i.item)}</span>)} 
     </div>}
     {r.description ? <div className="container flex flex-col">

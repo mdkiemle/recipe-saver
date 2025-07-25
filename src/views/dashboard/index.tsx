@@ -1,4 +1,4 @@
-import {ReactElement, useContext, useEffect, useState} from "react";
+import {ReactElement, useCallback, useContext, useEffect, useState} from "react";
 import {SearchRecipe} from "../../../src/models/recipe";
 import { CreateRecipeModal } from "../../modals/";
 import { Button } from "@headlessui/react";
@@ -12,6 +12,7 @@ import { FolderContext } from "../../context/FolderContext";
 import { NoFolderSection } from "../../components/NoFolderSection";
 import { CreateFolderModal } from "../../modals";
 import { PiChefHat, PiFolderFill } from "react-icons/pi";
+import { SearchResultText } from "../../../src/components/SearchResultText";
 
 export interface RecipeReturn {
   id: number;
@@ -27,7 +28,7 @@ const DashboardPage = (): ReactElement => {
   const [showCreateRecipe, setShowCreateRecipe] = useState(false);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [searching, setSearching] = useState(false);
-  const {activeSearch, folder, setFolder, setActiveSearch} = useContext(DashboardContext);
+  const {activeSearch, folder, setFolder, setActiveSearch, setSearch} = useContext(DashboardContext);
   const {folders} = useContext(FolderContext);
 
   const toggleShowCreateRecipe = (): void => setShowCreateRecipe(prev => !prev);
@@ -40,9 +41,17 @@ const DashboardPage = (): ReactElement => {
     });
   };
 
+  const filterSearch = useCallback((value: string): string[] => {
+    const temp = value.split(",");
+    const trimmed = temp.map(value => value.trim());
+    console.log("What is it: ", trimmed);
+    return trimmed;
+  }, []);
+
   const handleSearch = (): void => {
     setSearching(true);
-    getRequest<SearchRecipe[], [string, number?]>("search", "search-return", [activeSearch, folder?.id])
+    const searchArray = filterSearch(activeSearch);
+    getRequest<SearchRecipe[], [string[], number?]>("search", "search-return", [searchArray, folder?.id])
     .then(res => {
       setRecipe(res);
       setSearching(false);
@@ -56,6 +65,7 @@ const DashboardPage = (): ReactElement => {
 
   const handleReset = (): void => {
     setActiveSearch("");
+    setSearch("");
     if (folder.id === 0) return setRecipe([]);
     getByFolder();
   };
@@ -66,15 +76,16 @@ const DashboardPage = (): ReactElement => {
 
   return (
     <div className="container md:mx-auto">
-      <header className="flex gap-2">
-        <Search handleSearch={setActiveSearch} handleReset={handleReset} resultCount={recipe.length}/>
-        <Button className="btn-primary self-start" onClick={toggleShowCreateRecipe}>
+      <header className="flex gap-2 justify-center pb-4">
+        <Search handleSearch={setActiveSearch}/>
+        <Button className="btn-primary self-center" onClick={toggleShowCreateRecipe}>
           <PiChefHat /> Create Recipe
         </Button>
-        <Button className="btn-secondary self-start" onClick={toggleShowCreateFolder}>
+        <Button className="btn-secondary self-center" onClick={toggleShowCreateFolder}>
           <PiFolderFill/> Create Folder
         </Button>
       </header>
+      {activeSearch && <SearchResultText resultCount={recipe.length} handleReset={handleReset}/>}
       <FolderNav />
       <div className="grid grid-cols-3 gap-2 grid-flow-row-dense">
         {!folder.id && !activeSearch && folders?.map(f => <FolderItem key={f.id} folder={f} onClick={setFolder}/>)}

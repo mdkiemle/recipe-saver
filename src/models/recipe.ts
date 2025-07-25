@@ -1,4 +1,3 @@
-import { KeysOfObj } from "../util/set-query-builder";
 import { IdName } from "./generic";
 
 export interface Ingredient {

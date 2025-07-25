@@ -182,7 +182,8 @@ ipcMain.on("copyGroupsWithIngs", (event, arg: {parentId: number, childId: number
     database.all(copy, (err, rows: IngredientGroup[]) => {
       if (err && err.message) return event.reply("copyGroupsWithIngs-return", err.message);
       // event.reply("copyGroupsWithIngs-return", (err && err.message) || rows);
-      const copiedGroups: IngredientGroup[] = rows.map(row => ({...row, ingredients: []}));
+      //@ts-ignore
+      const copiedGroups: IngredientGroup[] | [] = rows.map(row => ({...row, ingredients: []}));
       originalGroupIds.forEach((id, idx) => {
         database.all(`
           insert into ingredient (item, measurement, ingredientGroupId)

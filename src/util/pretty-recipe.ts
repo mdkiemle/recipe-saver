@@ -24,6 +24,7 @@ export const prettyRecipe = (tableReturn: RawReturn[], timers: Timer[]): Recipe 
   const keys = Object.keys(uniqueGroups);
   const ingGroups: IngredientGroup[] = [];
   for (const key of keys) {
+    //@ts-ignore
     const ingT: Ingredient[] = uniqueGroups[key].flatMap(g => {
       if (g.ingredientId) return {
         id: g.ingredientId,

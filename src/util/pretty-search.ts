@@ -1,5 +1,5 @@
 import {groupBy} from "lodash";
-import { Ingredient, Recipe, SearchRecipe } from "../models/recipe";
+import {SearchRecipe} from "../models/recipe";
 
 export interface SearchRecipeRawReturn {
   id: number;
@@ -31,5 +31,6 @@ export const prettySearch = (tableReturn: SearchRecipeRawReturn[]): SearchRecipe
     };
     recipes.push(thisRecipe);
   }
+  recipes.sort((a, b) => b.ingredients.length - a.ingredients.length);
   return recipes;
 };

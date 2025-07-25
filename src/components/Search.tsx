@@ -5,29 +5,13 @@ import { useSearchParams } from "react-router-dom";
 
 export interface SearchProps {
   handleSearch: (value: string) => void;
-  handleReset: () => void;
-  resultCount?: number;
 }
 
-const Search = ({handleSearch, handleReset, resultCount}: SearchProps): ReactElement => {
-  const {search, setSearch, activeSearch, folder} = useContext(DashboardContext);
-
-  const resetSearch = (): void => {
-    setSearch("");
-    handleReset();
-  };
-
+const Search = ({handleSearch}: SearchProps): ReactElement => {
+  const {search, setSearch} = useContext(DashboardContext);
   return (
     <div className="flex-1">
       <SearchInput onEnter={handleSearch} search={search} setSearch={setSearch}/>
-      <div className="container h-8 flex gap-2 items-center">
-      {resultCount >= 0 && activeSearch && 
-        <>
-          <span className="text-orange-800">Showing {resultCount} results for &quot;{activeSearch}&quot;</span>
-          <button onClick={resetSearch} className="link">Clear results</button>
-        </>
-      }
-      </div>
     </div>
   );
 };

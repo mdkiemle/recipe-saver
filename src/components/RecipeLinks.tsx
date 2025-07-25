@@ -38,11 +38,8 @@ const RecipeLinks = ({openModal}: RecipeLinksProps): ReactElement | undefined =>
     })
   };
 
-  const handleViewRecipe = (): void => {
-    // var url = `${window.location.origin}/#/recipe/view-only/${id}`;
-    var url = `${window.location.origin}/#`;
-    newWindowViewOnly({id, name});
-    // window.open(window.location.origin, '_blank', 'top=500,left=200')
+  const handleViewRecipe = (recipeId: number, recipeName: string): void => {
+    newWindowViewOnly({id: recipeId, name: recipeName});
   }
 
   useEffect(() => {
@@ -67,7 +64,7 @@ const RecipeLinks = ({openModal}: RecipeLinksProps): ReactElement | undefined =>
         {recipeLinks.map(link => <div key={link.id} className="flex items-center gap-2">{link.label ?
           <span className="w-auto" key={link.id}>{link.label}: <span className="font-semibold">{link.name}</span></span>
           : <span key={link.id} className="font-semibold w-auto">{link.name}</span>}
-          <Button className="btn-secondary" onClick={handleViewRecipe}>View Recipe</Button>
+          {!isEditing && <Button className="btn-secondary" onClick={() => handleViewRecipe(link.id, link.name)}>View Recipe</Button>}
           {isEditing && <PiTrash onClick={() => handleDelete(link.id)} className="fill-red-500 cursor-pointer" />}
           </div>
         )}

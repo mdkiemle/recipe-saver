@@ -20,10 +20,8 @@ ipcMain.on("viewOnlyWindow", (event, arg: {id: string, name: string}) => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      additionalArguments: [`--${arg.id}`]
     }
   });
-  console.log("What is this value: ", SECONDARY_WINDOW_WEBPACK_ENTRY);
   // win.webContents.on("dom-ready", () => {
   //   win.once("page-title-updated", e => e.preventDefault());
   //   win.show();
@@ -35,7 +33,6 @@ ipcMain.on("viewOnlyWindow", (event, arg: {id: string, name: string}) => {
     win = null;
   });
   win.webContents.once("dom-ready", () => {
-    console.log("HEY!");
     win.webContents.send("load-recipe", arg.id);
   });
   win.loadURL(SECONDARY_WINDOW_WEBPACK_ENTRY);

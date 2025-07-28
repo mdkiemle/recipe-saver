@@ -44,7 +44,6 @@ const DashboardPage = (): ReactElement => {
   const filterSearch = useCallback((value: string): string[] => {
     const temp = value.split(",");
     const trimmed = temp.map(value => value.trim());
-    console.log("What is it: ", trimmed);
     return trimmed;
   }, []);
 

@@ -9,7 +9,6 @@ export interface SearchResultTextProps {
 const SearchResultText = ({resultCount, handleReset}: SearchResultTextProps): ReactElement => {
   const {activeSearch} = useContext(DashboardContext);
   const searchText = useMemo(() => {
-    console.log("Hey!");
     return activeSearch.split(",").map(value => value.trim()).map(v => `"${v}"`).join(" and ");
   }, [activeSearch]);
 

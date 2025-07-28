@@ -51,12 +51,7 @@ const PrintPage = (): ReactElement => {
       const data = target.contentWindow.document.documentElement.outerHTML;
       const blob = new Blob([data], {type: "text/html"});
       const url = URL.createObjectURL(blob);
-
       printPrevew(url);
-      // window.electronAPI.previewComponent(url, (response: any) => {
-      //   console.log("Main: ", response);
-      // });
-      
     });
   };
 

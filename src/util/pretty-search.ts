@@ -13,7 +13,6 @@ export interface SearchRecipeRawReturn {
 export const prettySearch = (tableReturn: SearchRecipeRawReturn[]): SearchRecipe[] | any => {
   const uniqueGroups = groupBy(tableReturn, "id");
   const keys = Object.keys(uniqueGroups);
-
   const recipes: SearchRecipe[] = [];
 
   for (const key of keys) {

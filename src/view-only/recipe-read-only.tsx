@@ -13,7 +13,6 @@ const RecipeViewOnly = (): ReactElement => {
 
   // I am not HUGE fan of this, but it's currently what I got.
   ipcRenderer.once("recipe-retrieved", (e, args: Recipe) => {
-    console.log("Inside the recipe-retrieved listener", args);
     setRecipe(args);
   });
   return (

@@ -6,7 +6,6 @@ const searchQueryBuilder = (value: string | string[]): string => {
   if (typeof value === "string") return `"%${value}%"`;
   const builtArray = value.map(v => `"%${v}%"`);
   const joinedStatement = builtArray.join(" or i.item like ");
-  console.log("what is the statement: ", joinedStatement);
   return joinedStatement;
 };
 
@@ -24,7 +23,7 @@ const withFolderSearch = (search: string, id: number): string => `
   left join folder f on f.id = fr.folderId
   left join ingredientGroup ig on r.id = ig.recipeId
   left join ingredient i on i.ingredientGroupId = ig.id
-  where i.item like ${search} and fr.folderId = ${id};
+  where (i.item like ${search}) and fr.folderId = ${id};
 `;
 
 ipcMain.on("search", (event, arg: [string[], number?]) => {

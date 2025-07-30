@@ -15,12 +15,9 @@ export interface RecipeLinksProps {
 }
 
 const RecipeLinks = ({openModal}: RecipeLinksProps): ReactElement | undefined => {
-  const {recipe: {id, recipeLinks, name}, isEditing, dispatch} = useContext(RecipeContext);
-  const {pathname} = useLocation();
+  const {recipe: {id, recipeLinks}, isEditing, dispatch} = useContext(RecipeContext);
   const [loading, setLoading] = useState(false);
   const [showing, setShowing] = useState(false);
-
-  console.log("Hey", location);
   const handleShowRecipeLink = (): void => setShowing(true);
   
   useMount(() => {

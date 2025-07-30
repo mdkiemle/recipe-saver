@@ -1,5 +1,5 @@
 import {ReactElement, useContext, useState} from "react";
-import {AddIngredientGroup, RawIngredientGroup, RecipeUpdateReturn, RecipeUpdates, RecipeUpdateVars} from "../../models/recipe"
+import {AddIngredientGroup, CopyRecipeReturn, CopyRecipeVars, RawIngredientGroup, RecipeUpdateReturn, RecipeUpdates, RecipeUpdateVars} from "../../models/recipe"
 import {RecipeContext} from "../../context/RecipeContext";
 import {Button, Field, Label, Switch} from "@headlessui/react"
 import {RecipeSection} from "../../components/recipe-section";
@@ -8,7 +8,7 @@ import { IngredientGroupSection } from "../../components/IngredientGroupSection"
 import { Card } from "../../components/Card";
 import { ToggleInput } from "../../components/ToggleInput";
 import { FolderSection } from "../../components/FolderSection";
-import { ConfirmModal, RecipeLinkModal } from "../../modals/";
+import { ConfirmModal, CopyRecipeModal, RecipeLinkModal } from "../../modals/";
 import {useNavigate} from "react-router";
 import { TimerSection } from "../../components/TimerSection";
 import {AiOutlineGroup} from "react-icons/ai"
@@ -22,12 +22,14 @@ export interface RecipePageProps {
 const RecipePage = ({isViewOnly = false}: RecipePageProps): ReactElement => {
   const {recipe, dispatch, loading, isEditing, setIsEditing, setAutoFocus} = useContext(RecipeContext);
   const [showDelete, setShowDelete] = useState(false);
+  const [showCopyModal, setShowCopyModal] = useState(false);
   const [linkModal, setLinkModal] = useState(false);
 
   const nav = useNavigate();
 
   const toggleDelete = (): void => setShowDelete(prev => !prev);
   const toggleLinkModal = (): void => setLinkModal(prev => !prev);
+  const toggleCopyModal = (): void => setShowCopyModal(prev => !prev);
 
   const handleUpdateRecipe = (updates: Partial<RecipeUpdateVars>): void => {
     if (updates?.name === "") return;
@@ -61,7 +63,7 @@ const RecipePage = ({isViewOnly = false}: RecipePageProps): ReactElement => {
 
   return (
     <div className="container flex flex-col gap-4 m-auto">
-      {!isViewOnly && <FolderSection />}
+      {!isViewOnly && <FolderSection handleShowCopy={toggleCopyModal}/>}
       {!loading && recipe && <>
         <Card className="container flex flex-row">
           <ToggleInput
@@ -112,6 +114,7 @@ const RecipePage = ({isViewOnly = false}: RecipePageProps): ReactElement => {
       <ConfirmModal isOpen={showDelete} onClose={toggleDelete} title="Delete Recipe" handleConfirm={handleDelete}>
         <div>Are you sure you want to delete this recipe? This cannot be undone</div>
       </ConfirmModal>
+      <CopyRecipeModal isOpen={showCopyModal} onClose={toggleCopyModal} />
       <RecipeLinkModal isOpen={linkModal} onClose={toggleLinkModal} />
     </div>
   );

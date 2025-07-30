@@ -26,6 +26,16 @@ export interface IngredientGroup extends RawIngredientGroup {
   ingredients: Ingredient[];
 }
 
+export interface CopyRecipeVars {
+  name: string;
+  recipe: Recipe;
+  folderIds: number[];
+}
+
+export interface CopyRecipeReturn {
+  id: number;
+}
+
 /**
  * Returns the id and name of the recipe, and includes the item
  * and measurements of the ingredient
@@ -132,6 +142,7 @@ export interface AddTimerVars {
   recipeId: number;
   minTime?: number;
   maxTime?: number;
+  // measurement?: TimerMeasure;
 }
 
 export interface AddTimerReturn {

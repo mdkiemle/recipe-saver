@@ -2,10 +2,11 @@ import {ipcMain} from "electron";
 import {database} from "../index";
 import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
-import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn, Folder, RecipeLink, AddRecipeLinkVars, Ingredient, IngredientGroup, DeleteLinkVars, DeleteTimerReturn} from "../models/recipe";
+import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn, Folder, RecipeLink, AddRecipeLinkVars, Ingredient, IngredientGroup, DeleteLinkVars, DeleteTimerReturn, Recipe, TimerUpdateVars, RecipeUpdateVars, CopyRecipeVars} from "../models/recipe";
 import { returnValues } from "../util/sql-returning";
 import { RecipeReturn } from "../types";
 import { addQueryBuilder } from "../util/add-query-builder";
+import { buildFolders, buildIngredientList } from "../util/multiple-line-transactions";
 
 
 // Might not be necessary? But just in case I want to use this elsewhere.
@@ -35,7 +36,7 @@ export const recipeLinkFromIds = (parentId: number, childId: number) => `
   left join recipe r1 on r1.id = rtr.recipeParentId
   left join recipe r2 on r2.id = rtr.recipeChildId
   where rtr.recipeParentId = ${parentId} AND rtr.recipeChildId = ${childId};
-`
+`;
 
 /**
  * select instructions, folder.name as folderName
@@ -197,6 +198,74 @@ ipcMain.on("copyGroupsWithIngs", (event, arg: {parentId: number, childId: number
           }
         });
       });
+    });
+  });
+});
+
+
+// We will need the full recipe in order to copy everything.
+// Maybe we could instead just send the current recipe instead of querying for it?
+ipcMain.on("copy-full-recipe", (event, {recipe, name, folderIds}: CopyRecipeVars): void => {
+  database.serialize(() => {
+    let recipeId = -1;
+    database.get(`insert into recipe (name) values ("${name}") returning id;`, (err, row: {id: number}) => {
+      if (err) return event.reply("copy-error", err?.message);
+      recipeId = row.id;
+      if (folderIds.length > 0) {
+        const folderSql = buildFolders(folderIds, recipeId);
+        database.exec(folderSql, (err: any) => {if (err && err.message) return event.reply("copy-error", err.message)});
+      }
+      // Create the "updates" portion so we can build the query for updating the recipe with values
+      const recipeUpdates: Partial<RecipeUpdateVars> = {
+          description: recipe.description,
+          instructions: recipe.instructions,
+          notes: recipe.notes,
+          totalTime: recipe.totalTime,
+        };
+      const setQuery = setQueryBuilder(recipeUpdates);
+      if (!setQuery) return event.reply("copy-error", "Error copying main values");
+      const updateSql = `
+        update recipe
+        set ${setQuery}
+        where id = ${recipeId};
+      `;
+
+      database.exec(updateSql, err => {if (err !== null) event.reply("copy-error", err.message)})
+      // Timer time. (heh)
+      recipe.timers.forEach((timer, idx) => {
+        const addTimerVars = {name: timer.name, recipeId, minTime: timer.minTime, maxTime: timer.maxTime, measurement: timer.measurement}
+        const [values, keys] = addQueryBuilder(addTimerVars);
+        const sql = `
+          insert into timer (${keys})
+          values (${values});
+        `;
+        database.exec(sql, err => {if (err && err.message) return event.reply("copy-error", err.message)});
+      });
+      // Timers done, now ingredients / ingredient groups
+      recipe.ingredientGroups.forEach(ingGroup => {
+        const ingGroupSql = `
+          insert into ingredientGroup (groupName, recipeId)
+          values ("${ingGroup.groupName}", "${recipeId}")
+          returning id;
+        `;
+        database.serialize(() => {
+          database.get(ingGroupSql, (err, row: {id: number}) => {
+            const groupId = row?.id;
+            const ingSql = buildIngredientList(ingGroup.ingredients, groupId);
+            database.exec(ingSql, err => {
+              if (err !== null) event.reply("copy-error", err);
+            });
+          });
+        });
+      });
+      // Finally, link to the old recipe and return when finished.
+      database.exec(`
+          insert into recipeToRecipe (recipeParentId, recipeChildId, label)
+          values (${recipeId}, ${recipe.id}, "Original recipe");
+        `, err => {
+          if (err && err.message) return event.reply("copy-error", err.message);
+          event.reply("copy-recipe-return", recipeId);
+        });
     });
   });
 });

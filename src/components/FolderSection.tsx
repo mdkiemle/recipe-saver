@@ -1,17 +1,21 @@
 import {ReactElement, useContext} from "react";
 import { RecipeContext } from "../context/RecipeContext";
 import { Pill } from "./Pill";
-import {PiFolderFill, PiPrinter, PiX } from "react-icons/pi";
+import {PiCopy, PiFolderFill, PiPrinter, PiX } from "react-icons/pi";
 import { FaChevronLeft, FaHome } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import { AddToFolder } from "./AddToFolder";
 import { getRequest } from "../messaging/send";
 import { DashboardContext } from "../context/DashboardContext";
-import { Folder } from "../models/recipe";
+import { CopyRecipeReturn, CopyRecipeVars, Folder } from "../models/recipe";
 
-const FolderSection = (): ReactElement => {
+export interface FolderSectionProps {
+  handleShowCopy: () => void;
+}
+
+const FolderSection = ({handleShowCopy}: FolderSectionProps): ReactElement => {
   const {setFolder} = useContext(DashboardContext);
-  const {folders, setFolders, isEditing, recipe: {id: recipeId}} = useContext(RecipeContext);
+  const {recipe, folders, setFolders, isEditing, recipe: {id: recipeId}} = useContext(RecipeContext);
   const nav = useNavigate();
 
   const removeFromFolder = (id: number): void => {
@@ -45,6 +49,7 @@ const FolderSection = (): ReactElement => {
           </Pill>
         )}
       </div>
+      <PiCopy className="w-6 h-6 self-center cursor-pointer" onClick={handleShowCopy}/>
       <PiPrinter className="w-6 h-6 self-center cursor-pointer" onClick={handlePrint}/>
       <AddToFolder />
     </div>

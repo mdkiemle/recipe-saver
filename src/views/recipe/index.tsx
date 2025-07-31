@@ -1,5 +1,5 @@
 import {ReactElement, useContext, useState} from "react";
-import {AddIngredientGroup, CopyRecipeReturn, CopyRecipeVars, RawIngredientGroup, RecipeUpdateReturn, RecipeUpdates, RecipeUpdateVars} from "../../models/recipe"
+import {AddIngredientGroup, RawIngredientGroup, RecipeUpdateReturn, RecipeUpdates, RecipeUpdateVars} from "../../models/recipe"
 import {RecipeContext} from "../../context/RecipeContext";
 import {Button, Field, Label, Switch} from "@headlessui/react"
 import {RecipeSection} from "../../components/recipe-section";
@@ -36,7 +36,7 @@ const RecipePage = ({isViewOnly = false}: RecipePageProps): ReactElement => {
     getRequest<RecipeUpdateReturn, RecipeUpdates>("update-recipe", "update-recipe-return", {id: recipe.id, updates})
     .then(res => {
       dispatch({type: "UPDATE_RECIPE", payload: res});
-    })
+    });
   };
 
   const handleAddGroup = (): void => {

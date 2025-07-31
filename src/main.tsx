@@ -24,6 +24,7 @@ const Main = (): ReactElement => (
           toastClassName="bg-purple-100 fill-orange-800"
           closeButton={CloseButton}
           autoClose={2500}
+          pauseOnHover={false}
         />
         <Routes>
           <Route index path="/" element={<DashboardPage />}/>

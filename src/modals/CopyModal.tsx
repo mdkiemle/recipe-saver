@@ -7,6 +7,8 @@ import { CopyRecipeVars } from "../models/recipe";
 import { RecipeContext } from "../context/RecipeContext";
 import { FaCheck } from "react-icons/fa";
 import { useNavigate } from "react-router/dist";
+import { toast } from "react-toastify";
+import { StandardToast } from "../components/toasts/StandardToast";
 
 export interface CopyRecipeModalProps {
   isOpen: boolean;
@@ -30,6 +32,10 @@ const CopyRecipeModal = ({isOpen, onClose}: CopyRecipeModalProps): ReactElement 
       .then(res => {
         setIsLoading(false);
         onClose();
+        toast(StandardToast, {
+          data: {content: "Copied recipe"},
+          theme: "dark",
+        });
         if (navToCreated) nav(`/recipe/${res}`);
       });
     };

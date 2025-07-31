@@ -14,6 +14,8 @@ import { TimerSection } from "../../components/TimerSection";
 import {AiOutlineGroup} from "react-icons/ai"
 import { RecipeLinks } from "../../components/RecipeLinks";
 import {unescape} from "validator";
+import { toast } from "react-toastify";
+import { StandardToast } from "../../components/toasts/StandardToast";
 
 export interface RecipePageProps {
   isViewOnly?: boolean;
@@ -55,7 +57,14 @@ const RecipePage = ({isViewOnly = false}: RecipePageProps): ReactElement => {
   const handleDelete = (): void => {
     getRequest<number, number>("delete-recipe", "delete-recipe-return", recipe.id)
     .then(res => {
-      if (res) nav(-1);
+      if (res) {
+        nav(-1);
+        setShowDelete(false);
+        toast(StandardToast, {
+          data: {content: "Deleted Recipe"},
+          theme: "dark",
+        });
+      }
     }).catch(err => {
       console.log("Uh oh: ", err);
     });

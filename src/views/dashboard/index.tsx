@@ -1,8 +1,7 @@
 import {ReactElement, useCallback, useContext, useEffect, useState} from "react";
 import {SearchRecipe} from "../../../src/models/recipe";
-import { CreateRecipeModal } from "../../modals/";
 import { Button } from "@headlessui/react";
-import { getRequest } from "../../messaging/send";
+import { createNewDatabase, getRequest, loadNewDatabase } from "../../messaging/send";
 import { RecipeCard } from "../../components/RecipeCard";
 import { Search } from "../../components/Search";
 import { DashboardContext } from "../../context/DashboardContext";
@@ -10,9 +9,10 @@ import { FolderItem } from "../../components/FolderItem";
 import { FolderNav } from "../../components/FolderNav";
 import { FolderContext } from "../../context/FolderContext";
 import { NoFolderSection } from "../../components/NoFolderSection";
-import { CreateFolderModal } from "../../modals";
+import { CreateRecipeModal, CreateFolderModal, DatabaseModal } from "../../modals";
 import { PiChefHat, PiFolderFill } from "react-icons/pi";
 import { SearchResultText } from "../../../src/components/SearchResultText";
+import { BrowserWindow, dialog, ipcRenderer } from "electron";
 
 export interface RecipeReturn {
   id: number;
@@ -27,12 +27,15 @@ const DashboardPage = (): ReactElement => {
   const [recipe, setRecipe] = useState<SearchRecipe[]>([]);
   const [showCreateRecipe, setShowCreateRecipe] = useState(false);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
+  const [showDatabaseModal, setShowDatabaseModal] = useState(false);
+  const [loadingDatabase, setLoadingDatabase] = useState(false);
   const [searching, setSearching] = useState(false);
   const {activeSearch, folder, setFolder, setActiveSearch, setSearch} = useContext(DashboardContext);
-  const {folders} = useContext(FolderContext);
+  const {folders, getFolders} = useContext(FolderContext);
 
   const toggleShowCreateRecipe = (): void => setShowCreateRecipe(prev => !prev);
   const toggleShowCreateFolder = (): void => setShowCreateFolder(prev => !prev);
+  const toggleShowDatabase = (): void => setShowDatabaseModal(prev => !prev);
 
   const getByFolder = (): void => {
     getRequest<SearchRecipe[], number>("get-recipes-by-folderId", "get-recipes-by-folderId-return", folder.id)
@@ -40,6 +43,7 @@ const DashboardPage = (): ReactElement => {
       setRecipe(res);
     });
   };
+
 
   const filterSearch = useCallback((value: string): string[] => {
     const temp = value.split(",");
@@ -66,7 +70,29 @@ const DashboardPage = (): ReactElement => {
     setActiveSearch("");
     setSearch("");
     if (folder.id === 0) return setRecipe([]);
+    setFolder({id: 0, name: ""})
     getByFolder();
+  };
+
+  // Could make these two a little cleaner, probably.
+  const createCallback = () => {
+    setLoadingDatabase(true);
+    createNewDatabase().then(res => {
+      getFolders();
+      handleReset();
+      setLoadingDatabase(false);
+      setShowDatabaseModal(false);
+    }).catch(res => console.log("I don't know: ", res));
+  };
+
+  const loadCallback = () => {
+    setLoadingDatabase(true);
+    loadNewDatabase().then(res => {
+      getFolders();
+      handleReset();
+      setLoadingDatabase(false);
+      setShowDatabaseModal(false);
+    }).catch(res => console.log("Maybe an error or something who knows", res));
   };
 
   useEffect(() => {
@@ -74,7 +100,7 @@ const DashboardPage = (): ReactElement => {
   }, [activeSearch]);
 
   return (
-    <div className="container md:mx-auto">
+    <div className="container md:mx-auto h-full">
       <header className="flex gap-2 justify-center pb-4">
         <Search handleSearch={setActiveSearch}/>
         <Button className="btn-primary self-center" onClick={toggleShowCreateRecipe}>
@@ -92,9 +118,13 @@ const DashboardPage = (): ReactElement => {
           <RecipeCard key={r.id} recipe={r}/>
         ))}
       </div>
-      <NoFolderSection show={!folder.id && !activeSearch}/>
+      {!folder.id && !activeSearch && !loadingDatabase && <NoFolderSection /> }
       <CreateRecipeModal isOpen={showCreateRecipe} onClose={toggleShowCreateRecipe} folderId={folder.id}/>
       <CreateFolderModal isOpen={showCreateFolder} onClose={toggleShowCreateFolder}/>
+      <DatabaseModal isOpen={showDatabaseModal} onClose={toggleShowDatabase} createCallback={createCallback} loadCallback={loadCallback}/>
+      <Button className="btn-secondary absolute bottom-2 right-2" onClick={toggleShowDatabase}>
+        Hello
+      </Button>
     </div>
   );
 };

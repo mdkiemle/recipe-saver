@@ -15,7 +15,7 @@ import { CloseButton } from "./components/toasts/CloseButton";
 
 // We could potentially have DashboardContext wrap everything here, but for now it's fine. 
 const Main = (): ReactElement => (
-  <div className="container relative m-auto">
+  <>
     <FolderContextProvider>
       <DashboardContextProvider>
         <ToastContainer
@@ -37,7 +37,7 @@ const Main = (): ReactElement => (
         </Routes>
       </DashboardContextProvider>
     </FolderContextProvider>
-  </div>
+  </>
 );
 
 export {Main};

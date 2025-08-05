@@ -6,11 +6,13 @@ import { getRequest } from "../messaging/send";
 export interface BaseFolderContext {
   folders: Folder[];
   dispatch: React.Dispatch<FolderAction>;
+  getFolders: () => void;
 }
 
 const FolderContext = createContext<BaseFolderContext>({
   folders: [],
   dispatch: () => undefined,
+  getFolders: () => undefined,
 });
 
 export type FolderAction = 
@@ -36,13 +38,17 @@ const folderReducer = (state: Folder[], action: FolderAction): Folder[] => {
 
 const FolderContextProvider = ({children}: PropsWithChildren): ReactElement => {
   const [folders, dispatch] = useReducer(folderReducer, []);
-  useMount(() => {
+
+  const getFolders = (): void => {
     getRequest<Folder[], undefined>("get-all-folders", "folders-get", undefined)
     .then(res => {
       dispatch({type: "UPDATE_FOLDERS", payload: res});
     });
-  });
-  return <FolderContext.Provider value={{folders, dispatch}}>
+  };
+
+  useMount(getFolders);
+
+  return <FolderContext.Provider value={{folders, dispatch, getFolders}}>
     {children}
   </FolderContext.Provider>
 };

@@ -32,8 +32,7 @@ export const setup = (db: sqlite.Database): void => {
 				name TEXT NOT NULL,
 				description TEXT,
 				notes TEXT,
-				instructions TEXT,
-        totalTime INTEGER
+				instructions TEXT
 			)
 		`);
 		db.run(`

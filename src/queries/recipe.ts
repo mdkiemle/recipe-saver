@@ -287,8 +287,12 @@ ipcMain.on("update-ingredient", (event, {id, updates}: IngredientUpdates) => {
 
 ipcMain.on("create-recipe", (event, {name, folderId}: {name: string, folderId: number}) => {
   const createSql = `insert into recipe (name) values ("${name}") returning id, name;`
+  console.log("We are inside the create-recipe", database);
   database.get(createSql, (err: { message: any; }, row: {id: number, name: string}) => {
-    if (err) return event.reply("create-error", err?.message);
+    if (err) {
+      console.log("What is the error? ")
+      return event.reply("create-error", err?.message);
+    }
     if (folderId !== 0) {
       database.exec(`
         insert into folderRecipe (recipeId, folderId)

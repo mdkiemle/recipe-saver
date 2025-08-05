@@ -1,10 +1,11 @@
-import {app, BrowserWindow} from 'electron';
+import {app, BrowserWindow, dialog, ipcMain, IpcMainEvent} from 'electron';
 import sqlite from "sqlite3";
 import "./queries/recipe";
 import "./queries/folder";
 import "./queries/search";
 import "./service/printing"
 import "./service/new-window";
+import "./service/open-or-new-database";
 import { setup } from './util/db-setupd';
 import {updateElectronApp} from "update-electron-app";
 
@@ -33,11 +34,27 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
-// TODO: some initial setup for when a person first starts app. (create tables, etc.)
-export const database = new sqlite.Database(`${app.getPath("userData")}/recipes.sqlite3`, (err: any) => {
+
+const databaseSetup = (filepath?: string, event?: IpcMainEvent, channel?: string, response?: string): sqlite.Database => new sqlite.Database(filepath ?? `${app.getPath("userData")}/recipes.sqlite3`, (err: any) => {
   if (err) console.error("Database opening error: ", err);
   setup(database);
+  if (event && channel && response) {
+    event.reply(channel, response);
+  }
 }).exec("PRAGMA foreign_keys=ON");
+
+// TODO: some initial setup for when a person first starts app. (create tables, etc.)
+// export let database = new sqlite.Database(`${app.getPath("userData")}/recipes.sqlite3`, (err: any) => {
+//   if (err) console.error("Database opening error: ", err);
+//   setup(database);
+// }).exec("PRAGMA foreign_keys=ON");
+ 
+export let database = databaseSetup();
+
+export const updateDatabase = (filepath: string, event: Electron.IpcMainEvent, channel: string, response: string): void => {
+  database.close();
+  database = databaseSetup(filepath, event, channel, response);
+};
 
 const createWindow = (): void => {
   // Create the browser window.

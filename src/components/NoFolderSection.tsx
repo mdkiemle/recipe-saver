@@ -12,11 +12,7 @@ import {getRequest} from "../messaging/send";
 import {RecipeCard} from "./RecipeCard";
 import {SearchRecipe} from "../models/recipe";
 
-export interface NoFolderSectionProps {
-  show: boolean;
-}
-
-const NoFolderSection = ({show}: NoFolderSectionProps): ReactElement | undefined => {
+const NoFolderSection = (): ReactElement | undefined => {
   const [recipe, setRecipe] = useState<SearchRecipe[]>([]);
   useMount(() => {
     getRequest<SearchRecipe[], undefined>("get-recipes-no-folder", "get-recipes-no-folder-return", undefined)
@@ -27,14 +23,10 @@ const NoFolderSection = ({show}: NoFolderSectionProps): ReactElement | undefined
 
   
   return (<>
-  {
-    show && <>
       <h3 className="text-lg">Unfolder&apos;d</h3>
       <div className="grid grid-cols-3 gap-2 grid-flow-row-dense">
         {recipe?.map(r => <RecipeCard key={r.id} recipe={r}/>)}
       </div>
-    </>
-  }
   </>
   );
 };

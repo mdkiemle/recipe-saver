@@ -25,12 +25,14 @@ const CreateRecipeModal = ({isOpen, onClose, folderId = 0}: CreateRecipeModalPro
 
   const handleCreate = (): void => {
     setIsLoading(true);
+    console.log("Inside create");
     getRequest<IdName, {name: string, folderId: number}>("create-recipe", "create-recipe-return", {name, folderId: selected})
     .then(result => {
       setIsLoading(false);
       nav(`/recipe/${result.id}`);
     }).catch(err => {
       console.error("something happened: ", err);
+      setIsLoading(false);
     });
   };
 

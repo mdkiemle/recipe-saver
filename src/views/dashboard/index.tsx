@@ -123,7 +123,7 @@ const DashboardPage = (): ReactElement => {
       <CreateFolderModal isOpen={showCreateFolder} onClose={toggleShowCreateFolder}/>
       <DatabaseModal isOpen={showDatabaseModal} onClose={toggleShowDatabase} createCallback={createCallback} loadCallback={loadCallback}/>
       <Button className="btn-secondary absolute bottom-2 right-2" onClick={toggleShowDatabase}>
-        Hello
+        Select Directory
       </Button>
     </div>
   );

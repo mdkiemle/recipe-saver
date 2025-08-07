@@ -25,7 +25,7 @@ const PrintColumnView = ({recipe: {name, timers, totalTime, ingredientGroups, in
     <h2 className="text-2xl">Ingredients</h2>
     {ingredientGroups.map(ig => <div key={ig.id} className="py-2">
       <h3 className="text-xl">{ig.groupName}</h3>
-      {ig.ingredients.map(ing => <p key={ing.id}>{ing.measurement} {ing.item ? unescape(ing.item) : ""}</p>)}
+      {ig.ingredients.map(ing => <p key={ing.id}>{ing.measurement ? unescape(ing.measurement) : ""} {ing.item ? unescape(ing.item) : ""}</p>)}
     </div>)}
     <h2 className="text-2xl">Directions</h2>
     {instructions ? unescape(instructions) : ""}

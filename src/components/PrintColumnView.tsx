@@ -28,10 +28,10 @@ const PrintColumnView = ({recipe: {name, timers, totalTime, ingredientGroups, in
       {ig.ingredients.map(ing => <p key={ing.id}>{ing.measurement ? unescape(ing.measurement) : ""} {ing.item ? unescape(ing.item) : ""}</p>)}
     </div>)}
     <h2 className="text-2xl">Directions</h2>
-    {instructions ? unescape(instructions) : ""}
+    {instructions ? <div className="whitespace-pre-wrap">{unescape(instructions)}</div> : ""}
      {notes && <>
         <h3 className="text-2xl pt-4">Notes</h3>
-        <div>
+        <div className="whitespace-pre-wrap">
           {unescape(notes)}
         </div>
       </>

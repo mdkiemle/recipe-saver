@@ -12,7 +12,6 @@ import { NoFolderSection } from "../../components/NoFolderSection";
 import { CreateRecipeModal, CreateFolderModal, DatabaseModal } from "../../modals";
 import { PiChefHat, PiFolderFill } from "react-icons/pi";
 import { SearchResultText } from "../../../src/components/SearchResultText";
-import { BrowserWindow, dialog, ipcRenderer } from "electron";
 
 export interface RecipeReturn {
   id: number;

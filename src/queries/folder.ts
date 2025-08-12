@@ -1,7 +1,7 @@
 import {ipcMain} from "electron";
-import {database} from "../index";
 import { RecipeReturn } from "../types";
 import { IdName } from "../models/generic";
+import { database } from "../service/database";
 
 ipcMain.on("get-all-folders", (event, arg) => {
 	const sql = `select * from folder`;

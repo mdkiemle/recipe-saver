@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import { AddToFolder } from "./AddToFolder";
 import { getRequest } from "../messaging/send";
 import { DashboardContext } from "../context/DashboardContext";
-import { CopyRecipeReturn, CopyRecipeVars, Folder } from "../models/recipe";
+import {Folder} from "../models/recipe";
 
 export interface FolderSectionProps {
   handleShowCopy: () => void;

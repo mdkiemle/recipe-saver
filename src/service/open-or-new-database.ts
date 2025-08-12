@@ -1,5 +1,5 @@
 import { BrowserWindow, dialog, ipcMain } from "electron";
-import { updateDatabase } from "../index";
+import { updateDatabase } from "../service/database";
 
 
 ipcMain.on("create-new-database", (event, arg) => {
@@ -9,13 +9,6 @@ ipcMain.on("create-new-database", (event, arg) => {
   }).then(result => {
     if(result.canceled) return;
     updateDatabase(result.filePath, event, "new-database-created", "success");
-    // Set up new database
-    // database.close();
-    // database = new sqlite.Database(result.filePath, (err: any) => {
-    //   if (err) console.error("Database opening error: ", err);
-    //   setup(database);
-    // }).exec("PRAGMA foreign_keys=ON");
-    // ipcMain.emit("loaded-new-db");
   });
 });
 

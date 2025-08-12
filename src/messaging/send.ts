@@ -56,3 +56,30 @@ export const loadNewDatabase = (): Promise<string> => {
     ipcRenderer.send("load-new-database");
   });
 };
+
+export const startApplication = (): Promise<"success" | "fail"> => {
+  return new Promise((resolve, reject) => {
+    ipcRenderer.once("finish-startup", (e, args: "success" | "fail") => {
+      if (typeof args === "string") {
+        resolve(args);
+      } else {
+        reject(args);
+      }
+    });
+    ipcRenderer.send("app-start");
+  });
+};
+
+export const defaultStorageLocation = (): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    ipcRenderer.once("default-location-return", (e, args: string) => {
+      if (typeof args === "string") {
+        resolve(args);
+        
+      } else {
+        reject(args);
+      }
+    });
+    ipcRenderer.send("get-default-location");
+  });
+};

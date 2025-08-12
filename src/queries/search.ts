@@ -1,5 +1,5 @@
 import {ipcMain} from "electron";
-import {database} from "../index";
+import { database } from "../service/database";
 import { prettySearch, SearchRecipeRawReturn } from "../util/pretty-search";
 
 const searchQueryBuilder = (value: string | string[]): string => {

@@ -1,5 +1,5 @@
 import {ipcMain} from "electron";
-import {database} from "../index";
+import { database } from "../service/database";
 import {RawReturn, prettyRecipe} from "../util/pretty-recipe";
 import {setQueryBuilder} from "../util/set-query-builder";
 import {RecipeTextUpdate, IngredientUpdates, AddIngredientGroup, AddIngredientVars, RecipeUpdates, TimerUpdates, Timer, AddTimerVars, DeleteGroupReturn, DeleteIngredientReturn, Folder, RecipeLink, AddRecipeLinkVars, Ingredient, IngredientGroup, DeleteLinkVars, DeleteTimerReturn, Recipe, TimerUpdateVars, RecipeUpdateVars, CopyRecipeVars} from "../models/recipe";

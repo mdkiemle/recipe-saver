@@ -1,5 +1,10 @@
-import {ipcRenderer} from "electron";
+import {app, ipcRenderer} from "electron";
 import { IdName } from "../models/generic";
+
+export interface FileOptions {
+  saveAsDefault?: boolean;
+  path?: string;
+}
 
 export const send = (reqName: string, message: string): Promise<any> => {
   return new Promise((resolve => {
@@ -31,7 +36,7 @@ export const newWindowViewOnly = (input: IdName) => {
   ipcRenderer.send("viewOnlyWindow", input);
 };
 
-export const createNewDatabase = (): Promise<string> => {
+export const createNewDatabase = (options?: FileOptions): Promise<string> => {
   return new Promise((resolve, reject) => {
     ipcRenderer.once("new-database-created", (e, args: string) => {
       if (args === "success") {
@@ -40,11 +45,11 @@ export const createNewDatabase = (): Promise<string> => {
         reject(args);
       }
     });
-    ipcRenderer.send("create-new-database");
+    ipcRenderer.send("create-new-database", options);
   });
 };
 
-export const loadNewDatabase = (): Promise<string> => {
+export const loadNewDatabase = (options?: FileOptions): Promise<string> => {
   return new Promise((resolve, reject) => {
     ipcRenderer.once("database-loaded", (e, args: string) => {
       if (args === "success") {
@@ -53,13 +58,13 @@ export const loadNewDatabase = (): Promise<string> => {
         reject(args);
       }
     });
-    ipcRenderer.send("load-new-database");
+    ipcRenderer.send("load-new-database", options);
   });
 };
 
-export const startApplication = (): Promise<"success" | "fail"> => {
+export const startApplication = (): Promise<string | "success"> => {
   return new Promise((resolve, reject) => {
-    ipcRenderer.once("finish-startup", (e, args: "success" | "fail") => {
+    ipcRenderer.once("finish-startup", (e, args: string | "success") => {
       if (typeof args === "string") {
         resolve(args);
       } else {

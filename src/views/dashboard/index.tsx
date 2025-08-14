@@ -29,6 +29,7 @@ const DashboardPage = (): ReactElement => {
   const [showDatabaseModal, setShowDatabaseModal] = useState(false);
   const [loadingDatabase, setLoadingDatabase] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [newDefault, setNewDefault] = useState(false);
   const {activeSearch, folder, setFolder, setActiveSearch, setSearch} = useContext(DashboardContext);
   const {folders, getFolders} = useContext(FolderContext);
 
@@ -76,7 +77,7 @@ const DashboardPage = (): ReactElement => {
   // Could make these two a little cleaner, probably.
   const createCallback = () => {
     setLoadingDatabase(true);
-    createNewDatabase().then(res => {
+    createNewDatabase({saveAsDefault: newDefault}).then(() => {
       getFolders();
       handleReset();
       setLoadingDatabase(false);
@@ -86,7 +87,7 @@ const DashboardPage = (): ReactElement => {
 
   const loadCallback = () => {
     setLoadingDatabase(true);
-    loadNewDatabase().then(res => {
+    loadNewDatabase({saveAsDefault: newDefault}).then(() => {
       getFolders();
       handleReset();
       setLoadingDatabase(false);
@@ -120,7 +121,14 @@ const DashboardPage = (): ReactElement => {
       {!folder.id && !activeSearch && !loadingDatabase && <NoFolderSection /> }
       <CreateRecipeModal isOpen={showCreateRecipe} onClose={toggleShowCreateRecipe} folderId={folder.id}/>
       <CreateFolderModal isOpen={showCreateFolder} onClose={toggleShowCreateFolder}/>
-      <DatabaseModal isOpen={showDatabaseModal} onClose={toggleShowDatabase} createCallback={createCallback} loadCallback={loadCallback}/>
+      <DatabaseModal
+        isOpen={showDatabaseModal}
+        onClose={toggleShowDatabase}
+        createCallback={createCallback}
+        loadCallback={loadCallback}
+        isDefault={newDefault}
+        setIsDefault={setNewDefault}
+      />
       <Button className="btn-secondary absolute bottom-2 right-2" onClick={toggleShowDatabase}>
         Select Directory
       </Button>

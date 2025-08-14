@@ -32,7 +32,8 @@ export const setup = (db: sqlite.Database): void => {
 				name TEXT NOT NULL,
 				description TEXT,
 				notes TEXT,
-				instructions TEXT
+				instructions TEXT,
+        totalTime INTEGER
 			)
 		`);
 		db.run(`
@@ -50,6 +51,7 @@ export const setup = (db: sqlite.Database): void => {
       CREATE TABLE IF NOT EXISTS recipeToRecipe (
         recipeParentId	INTEGER,
         recipeChildId	INTEGER,
+        label TEXT,
         FOREIGN KEY(recipeChildId)
           REFERENCES recipe(id) ON DELETE CASCADE,
         FOREIGN KEY(recipeParentId)
@@ -92,7 +94,11 @@ export const setup = (db: sqlite.Database): void => {
       );
     `)
     db.get("PRAGMA user_version", (err, {user_version}) => {
-      update(user_version, db);
+      if (user_version === 0) {
+        db.run(`PRAGMA user_version = ${CURRENT_VERSION}`);
+      } else {
+        update(user_version, db);
+      }
     });
 	});
 }

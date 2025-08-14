@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import sqlite from "sqlite3";
 import { setup } from '../util/db-setupd';
+import { unescape } from "querystring";
 
 interface UserSettings {
   defaultLocation: string;
@@ -14,7 +15,7 @@ interface UserSettings {
 
 
 const userPath = app.getPath("userData");
-const filePath = path.join(userPath, "user-settings.json");
+const settingsPath = path.join(userPath, "user-settings.json");
 const defaultSettings: UserSettings = {defaultLocation: ""}; // Might not even use this the first time.
 
 export let database: sqlite.Database = undefined; // This is how we're gonna do it from now on.
@@ -22,8 +23,9 @@ export let database: sqlite.Database = undefined; // This is how we're gonna do 
 
 // Might need to touch this up as we go.
 
-const databaseSetup = (filepath?: string, event?: IpcMainEvent, channel?: string, response?: string): sqlite.Database => new sqlite.Database(filepath ?? `${userPath}/recipes.sqlite3`, (err: any) => {
+const databaseSetup = (filepath: string, event?: IpcMainEvent, channel?: string, response?: string): sqlite.Database => new sqlite.Database(filepath, (err: any) => {
   if (err) console.error("Database opening error: ", err);
+  console.log("inside database setup");
   setup(database);
   if (event && channel && response) {
     event.reply(channel, response);
@@ -31,9 +33,17 @@ const databaseSetup = (filepath?: string, event?: IpcMainEvent, channel?: string
 }).exec("PRAGMA foreign_keys=ON");
 
 export const updateDatabase = (filepath: string, event: Electron.IpcMainEvent, channel: string, response: string): void => {
-  database.close();
+  database?.close();
   database = databaseSetup(filepath, event, channel, response);
 };
+
+export const updateSettings = (path: string): void => {
+  console.log("What is the path?", path);
+  const settings: UserSettings = {defaultLocation: path};
+  fs.writeFile(settingsPath, JSON.stringify(settings), err => {
+    if (err) return console.log("Error writing to file: ", err);
+  });
+}
 
 
 
@@ -46,29 +56,24 @@ ipcMain.on("app-start", (event, args) => {
    * have a database just didn't pick where it was stored), or this is the first time they've started the app up.
    * Both cases, we want to return with a "nope", essentially, then 
    */
-  fs.readFile(filePath, "utf8", (err, data) => {
+  fs.readFile(settingsPath, "utf8", (err, data) => {
+    console.log("We are inside startup");
     // This gets the user settings. If there is an error we want to return.
     if (err)
     {
       if (err.code === "ENOENT") {
         console.log("No such file exists at location specified");
-        event.reply("finish-startup", "fail");
+        event.reply("finish-startup", userPath);
       } else {
         console.log("Error reading file: ", err);
       }
     }
     try {
       const userSettings = JSON.parse(data) as UserSettings;
-      console.log("File contents: ", userSettings);
-      databaseSetup(userSettings.defaultLocation); // This sets our database to where our defaultLocation is. (or should)
+      console.log("File contents: ", userSettings, userPath);
+      updateDatabase(unescape(userSettings.defaultLocation), event, "finish-startup", "success"); // This sets our database to where our defaultLocation is. (or should)
     } catch (e) {
       console.log("Error parsing user settings", e);
     }
   });
-});
-
-// All this does is return the string of the default location where a database is stored, in case someone has started the app
-// before this update.
-ipcMain.on("get-default-location", event => {
-
 });

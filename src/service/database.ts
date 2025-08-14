@@ -26,10 +26,11 @@ export let database: sqlite.Database = undefined; // This is how we're gonna do 
 const databaseSetup = (filepath: string, event?: IpcMainEvent, channel?: string, response?: string): sqlite.Database => new sqlite.Database(filepath, (err: any) => {
   if (err) console.error("Database opening error: ", err);
   console.log("inside database setup");
-  setup(database);
-  if (event && channel && response) {
-    event.reply(channel, response);
-  }
+  setup(database).then(() => {
+    if (event && channel && response) {
+      event.reply(channel, response);
+    }
+  });
 }).exec("PRAGMA foreign_keys=ON");
 
 export const updateDatabase = (filepath: string, event: Electron.IpcMainEvent, channel: string, response: string): void => {

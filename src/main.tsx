@@ -38,7 +38,6 @@ const Main = (): ReactElement => {
   useMount(() => {
     console.log("Main has mounted");
     startApplication().then(value => {
-      console.log("What's the value?", value);
       if (value === "success") setHasDatabase(true);
       else {
         setDefaultLocation(value); // might not work.

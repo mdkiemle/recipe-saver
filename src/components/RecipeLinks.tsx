@@ -22,10 +22,12 @@ const RecipeLinks = ({openModal}: RecipeLinksProps): ReactElement | undefined =>
   
   useMount(() => {
     setLoading(true);
-    getRequest<RecipeLink[], number>("get-recipe-links", "get-recipe-links-return", id).then(res => {
-      dispatch({type: "ADD_LINKS", payload: res});
-      setLoading(false);
-    }).catch(err => console.log("Error returning links: ", err));
+    if (recipeLinks.length === 0) { // This reruns whenever we come back from print preview so we get duplicates.
+      getRequest<RecipeLink[], number>("get-recipe-links", "get-recipe-links-return", id).then(res => {
+        dispatch({type: "ADD_LINKS", payload: res});
+        setLoading(false);
+      }).catch(err => console.log("Error returning links: ", err));
+    }
   });
 
   const handleDelete = (recipeChildId: number): void => {
